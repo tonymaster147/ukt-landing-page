@@ -252,20 +252,16 @@ export const faqData = [
     a: 'Standard documents such as birth certificates, marriage certificates, and driving licences are typically delivered within 6–24 hours. Larger or specialist documents take 1–2 business days. Your exact delivery date is confirmed in your instant quote before you pay — and we deliver on or before that deadline, guaranteed.',
   },
   {
-    q: 'What happens if my translation is rejected by an authority?',
-    a: 'If a certified translation we provide is rejected by a UK authority due to an error on our part, we will correct and re-certify it free of charge. We also offer unlimited revisions, so if anything needs adjusting after delivery, your translator will fix it at no extra cost.',
-  },
-  {
     q: 'Can you translate my birth certificate, marriage certificate, or driving licence?',
     a: 'Yes — these are our most common orders. We provide certified translations of birth certificates, marriage certificates, driving licences, academic transcripts, bank statements, and passports in 200+ language pairs, usually within 24 hours. Upload your document through the quote form to get your price instantly.',
   },
   {
     q: 'Is my translation done by a human or a machine?',
-    a: 'Every certified and official translation is completed 100% by a qualified human linguist — never machine translation. Your document is matched to a native-speaking translator with subject expertise, then quality-checked before delivery, in line with our ISO 17100 certified process.',
+    a: 'Every certified and official translation is completed 100% by a qualified human linguist — never machine translation. However, for scalable professional translations such as ecommerce, website, and industrial translations, we assign a native-speaking translator with subject expertise, offering machine-assisted human translation. For every translation, we conduct a thorough quality check before delivery, in line with our ISO 17100-certified process.',
   },
   {
     q: 'How do I get a quote and place an order?',
-    a: "Fill in the quote form above, upload your document, and you'll receive an instant quote with the total cost and guaranteed delivery date. Pay securely online, and your translation is delivered as a PDF to your email — with hard copies available on request. The whole process takes under two minutes to start.",
+    a: "Fill in the quote form above, upload your document, choose the delivery date and format, and you'll receive an instant quote. Pay securely online, and your translation is delivered as a PDF to your email as per your deadline — with hard copies available on request. The whole process takes under two minutes to start.",
   },
   {
     q: 'Are my documents kept confidential?',
