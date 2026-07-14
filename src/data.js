@@ -20,7 +20,7 @@ export const THANK_YOU_URL = 'https://www.translations.co.uk/thank-you-two/'
 
 export const trustStrip = [
   { k: '98%', v: 'Satisfaction rate', icon: 'uploads/icons/0501.png' },
-  { k: '100%', v: 'Human translation', icon: 'uploads/icons/0402.png' },
+  { k: '100%', v: 'UK Certified Translator', icon: 'uploads/icons/0402.png' },
   { k: '200+', v: 'Languages', icon: 'uploads/icons/0303.png' },
   { k: '24/7', v: 'Support', icon: 'uploads/icons/0204.png' },
   { k: 'ISO', v: 'Guaranteed quality', icon: 'uploads/icons/0105.png' },
