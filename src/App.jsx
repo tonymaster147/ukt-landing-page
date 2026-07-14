@@ -13,31 +13,12 @@ import {
 const MAX = 1200
 
 /* ------------------------------------------------------------------ */
-/*  Image with a loading placeholder                                   */
-/*  Shows a soft striped placeholder until the image has painted.      */
+/*  Image — native lazy-load, always visible. Deterministic markup so   */
+/*  it prerenders into the static HTML and hydrates without mismatch.   */
 /* ------------------------------------------------------------------ */
 
-const PLACEHOLDER =
-  'repeating-linear-gradient(45deg,#F3E9E7 0,#F3E9E7 8px,#F8F1EF 8px,#F8F1EF 16px)'
-
 function Img({ src, alt = '', style, ...rest }) {
-  const [loaded, setLoaded] = useState(false)
-  return (
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      onLoad={() => setLoaded(true)}
-      onError={() => setLoaded(true)}
-      {...rest}
-      style={{
-        ...style,
-        backgroundImage: loaded ? undefined : PLACEHOLDER,
-        transition: 'opacity 0.35s ease',
-        opacity: loaded ? (style && style.opacity != null ? style.opacity : 1) : 0,
-      }}
-    />
-  )
+  return <img src={src} alt={alt} loading="lazy" decoding="async" {...rest} style={style} />
 }
 
 /* ------------------------------------------------------------------ */
@@ -116,9 +97,9 @@ function WhyIcon({ name, size = 24 }) {
 /* ------------------------------------------------------------------ */
 
 function useNarrow(bp = 820) {
-  const [narrow, setNarrow] = useState(
-    typeof window !== 'undefined' ? window.innerWidth < bp : false,
-  )
+  // Start false on both server and first client render (so hydration matches),
+  // then measure the real viewport after mount.
+  const [narrow, setNarrow] = useState(false)
   useEffect(() => {
     const onResize = () => setNarrow(window.innerWidth < bp)
     onResize()
