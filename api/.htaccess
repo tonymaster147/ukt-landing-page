@@ -1,0 +1,9 @@
+# Protect sensitive files from being fetched directly over HTTP.
+<FilesMatch "\.(sql|md)$">
+  Require all denied
+</FilesMatch>
+
+# config.php is executed by PHP (never served as text), but deny direct access anyway.
+<Files "config.php">
+  Require all denied
+</Files>

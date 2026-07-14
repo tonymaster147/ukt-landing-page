@@ -1,0 +1,15 @@
+# Hardening for the uploads folder: never execute anything here, no directory listing.
+Options -Indexes
+
+# Disable PHP execution (belt-and-braces; different servers honour different directives).
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+
+# Block any script/executable extensions from being served or run.
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|pht|phar|cgi|pl|py|asp|aspx|sh|exe)$">
+  Require all denied
+</FilesMatch>

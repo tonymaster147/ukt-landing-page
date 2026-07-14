@@ -1,0 +1,23 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+
+# Original design source (keep out of the app build)
+UKT - Landing page redesign/
+UKT - Landing page redesign.zip
+
+# Backend secrets & uploaded files — never commit
+api/config.php
+api/files_upload/*
+!api/files_upload/.htaccess
+!api/files_upload/index.html
+scratch-*.log
+
+# Local tooling / credentials — never commit
+.claude/
+*.local
+.env
+.env.*

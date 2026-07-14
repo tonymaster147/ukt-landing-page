@@ -1,0 +1,22 @@
+# Force the canonical www host (whole site uses www) — 301 non-www -> www.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^translations\.co\.uk$ [NC]
+  RewriteRule ^ https://www.translations.co.uk%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Cache policy for the landing page.
+<IfModule mod_headers.c>
+  # Hashed, content-addressed assets (JS/CSS) + fonts never change — cache hard.
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Images: long but not immutable (filenames aren't hashed).
+  <FilesMatch "\.(png|jpe?g|webp|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  # HTML must always revalidate so new deploys show up immediately.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
