@@ -22,3 +22,7 @@ scratch-*.log
 *.local
 .env
 .env.*
+
+# Lead data (PII) — never commit
+*.csv
+api/export.php

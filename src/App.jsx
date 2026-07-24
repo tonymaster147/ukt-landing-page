@@ -2151,6 +2151,28 @@ function Footer() {
           © 2026 translations.co.uk · ISO 17100 &amp; 18587 Certified
         </div>
       </div>
+      <div
+        className="section-pad"
+        style={{
+          maxWidth: 1160,
+          margin: '22px auto 0',
+          padding: '18px 32px 0',
+          borderTop: '1px solid #2A2A2A',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 24,
+          flexWrap: 'wrap',
+          fontSize: 13,
+          fontWeight: 700,
+        }}
+      >
+        <a href="https://www.translations.co.uk/privacy-policy/" style={{ color: '#C9C4C0' }}>
+          Privacy Policy
+        </a>
+        <a href="https://www.translations.co.uk/terms-and-conditions/" style={{ color: '#C9C4C0' }}>
+          Terms &amp; Conditions
+        </a>
+      </div>
     </footer>
   )
 }
