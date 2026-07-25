@@ -1,10 +1,10 @@
 // All landing-page content, extracted verbatim from the approved design.
 
-export const PHONE = '+44 7365 600193'
-export const PHONE_TEL = '+447365600193'
+export const PHONE = '+44 7454 757504'
+export const PHONE_TEL = '+447454757504'
 export const EMAIL = 'info@translations.co.uk'
 export const WHATSAPP_URL =
-  'https://wa.me/447365600193?text=Hi%2C%20I%27d%20like%20a%20translation%20quote.'
+  'https://wa.me/447454757504?text=Hi%2C%20I%27d%20like%20a%20translation%20quote.'
 
 // Every call-to-action points here.
 export const QUOTE_URL = 'https://www.translations.co.uk/quote/'
