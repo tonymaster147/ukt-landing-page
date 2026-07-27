@@ -445,7 +445,7 @@ function QuoteForm() {
             {step === 1 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <input name="name" placeholder="Name" required className="field" style={field} />
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="form-row-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <input
                     name="email"
                     type="email"
@@ -493,7 +493,7 @@ function QuoteForm() {
                     />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div className="form-row-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <input name="from" placeholder="From Language" className="field" style={field} />
                   <input name="to" placeholder="To Language" className="field" style={field} />
                 </div>

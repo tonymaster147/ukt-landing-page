@@ -265,6 +265,10 @@ button {
   .header-phone {
     display: none !important;
   }
+  /* Quote form: stack the 2-up rows (email/phone, from/to) into one column. */
+  .form-row-2 {
+    grid-template-columns: 1fr !important;
+  }
   /* Compact header CTA on phones: shorter label, tighter padding, smaller logo. */
   .cta-full {
     display: none;
