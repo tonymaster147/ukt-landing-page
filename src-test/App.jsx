@@ -662,10 +662,15 @@ function QuoteForm() {
                 color: '#A79F9A',
                 fontSize: 12,
                 fontWeight: 600,
+                lineHeight: 1.6,
                 margin: '16px 0 0',
               }}
             >
-              🔒 Your details are secure and never shared.
+              🔒 Your documents remain confidential.
+              <br />
+              No spam.
+              <br />
+              Response within 10 minutes.
             </p>
           </form>
         </div>
