@@ -280,6 +280,7 @@ function toE164UK(raw) {
 function QuoteForm() {
   const [step, setStep] = useState(1)
   const [step1Data, setStep1Data] = useState({})
+  const [files, setFiles] = useState([])
   const [captchaError, setCaptchaError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
@@ -287,19 +288,17 @@ function QuoteForm() {
   const [cap, setCap] = useState(() => ({ a: randDigit(), b: randDigit() }))
   const newCaptcha = () => setCap({ a: randDigit(), b: randDigit() })
 
-  // Capture the step-1 field values before they unmount, after validating them.
+  // Step 1 = documents + language pair. Capture them before the step unmounts.
   const goToStep2 = () => {
     const form = document.querySelector('#quote-form form')
     if (form && !form.reportValidity()) return
     const el = form.elements
     setStep1Data({
-      name: el['name'].value.trim(),
-      email: el['email'].value.trim(),
-      phone: el['phone'].value.trim(),
-      from: el['from'].value.trim(),
-      to: el['to'].value.trim(),
-      purpose: el['purpose'].value.trim(),
+      from: el['from'] ? el['from'].value.trim() : '',
+      to: el['to'] ? el['to'].value.trim() : '',
     })
+    const fileInput = el['files']
+    setFiles(fileInput && fileInput.files ? Array.from(fileInput.files).slice(0, 10) : [])
     setSubmitError('')
     setStep(2)
   }
@@ -324,22 +323,24 @@ function QuoteForm() {
     }
     setCaptchaError(false)
 
-    // Build the submission (step-1 values from state + step-2 fields from the DOM)
+    const emailNorm = ((el['email'] && el['email'].value) || '').trim().toLowerCase()
+    const phoneNorm = toE164UK((el['phone'] && el['phone'].value) || '')
+
+    // Build the submission: name/email/phone/purpose from step 2 (DOM),
+    // language pair from step 1 (state), files captured in step 1 (state).
     const fd = new FormData()
-    fd.append('name', step1Data.name || '')
-    fd.append('email', step1Data.email || '')
-    fd.append('phone', step1Data.phone || '')
+    fd.append('name', (el['name'] && el['name'].value.trim()) || '')
+    fd.append('email', emailNorm)
+    fd.append('phone', (el['phone'] && el['phone'].value.trim()) || '')
     fd.append('from', step1Data.from || '')
     fd.append('to', step1Data.to || '')
-    fd.append('purpose', step1Data.purpose || '')
+    fd.append('purpose', '')
     fd.append('description', (el['description'] && el['description'].value.trim()) || '')
     fd.append('captcha', (el['captcha'] && el['captcha'].value) || '')
     fd.append('captcha_a', String(cap.a))
     fd.append('captcha_b', String(cap.b))
 
-    // Attach up to 10 uploaded files (the PHP endpoint stores them in /files_upload).
-    const fileInput = el['files']
-    const files = fileInput && fileInput.files ? Array.from(fileInput.files).slice(0, 10) : []
+    // Attach the documents uploaded in step 1 (up to 10).
     files.forEach((file) => fd.append('files[]', file, file.name))
 
     setSubmitting(true)
@@ -350,8 +351,6 @@ function QuoteForm() {
       if (data.success) {
         // Enhanced Conversions: stash normalised email/phone so GTM can read them
         // on the /thank-you-two/ page (same origin) and attach to the conversion.
-        const emailNorm = (step1Data.email || '').trim().toLowerCase()
-        const phoneNorm = toE164UK(step1Data.phone)
         try {
           sessionStorage.setItem('lead_email', emailNorm)
           sessionStorage.setItem('lead_phone', phoneNorm)
@@ -421,7 +420,7 @@ function QuoteForm() {
               >
                 1
               </div>
-              <span style={{ fontSize: 13, fontWeight: 800, color: '#1C1C1C' }}>Your details</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: '#1C1C1C' }}>Documents</span>
             </div>
             <div
               style={{
@@ -460,73 +459,46 @@ function QuoteForm() {
               <span
                 style={{ fontSize: 13, fontWeight: 800, color: step === 2 ? '#1C1C1C' : '#B79A95' }}
               >
-                Documents
+                Your details
               </span>
             </div>
           </div>
 
           <form onSubmit={onFormSubmit}>
             {step === 1 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <input name="name" placeholder="Name" required className="field" style={field} />
-                <div className="form-row-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="Email*"
-                    required
-                    className="field"
-                    style={field}
-                  />
-                  <div
-                    className="field-wrap"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      border: '1px solid #E6D9D6',
-                      borderRadius: 12,
-                      background: '#FCFAFA',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '0 10px 0 14px',
-                        fontSize: 15,
-                        fontWeight: 700,
-                        whiteSpace: 'nowrap',
-                        borderRight: '1px solid #EADBD8',
-                      }}
-                    >
-                      <UKFlag w={18} /> +44
-                    </span>
-                    <input
-                      name="phone"
-                      placeholder="Phone"
-                      style={{
-                        border: 'none',
-                        background: 'transparent',
-                        padding: '14px 12px',
-                        fontSize: 15,
-                        width: '100%',
-                        outline: 'none',
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="form-row-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <label
+                  className="upload-box"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    padding: '30px 16px',
+                    border: '1.5px dashed #D8C7C3',
+                    borderRadius: 12,
+                    background: '#FCFAFA',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                  }}
+                >
+                  <span style={{ fontSize: 26, color: '#B0857E' }}>🗂</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#3A3634' }}>
+                    Click or drag your document to upload.
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#A79F9A' }}>
+                    You can upload up to 10 files.
+                  </span>
+                  <input name="files" type="file" multiple style={{ display: 'none' }} />
+                </label>
+                <div
+                  className="form-row-2"
+                  style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}
+                >
                   <input name="from" placeholder="From Language" className="field" style={field} />
                   <input name="to" placeholder="To Language" className="field" style={field} />
                 </div>
-                <input
-                  name="purpose"
-                  placeholder="Purpose Of The Translation"
-                  className="field"
-                  style={field}
-                />
                 <button
                   type="button"
                   onClick={goToStep2}
@@ -550,39 +522,61 @@ function QuoteForm() {
             )}
 
             {step === 2 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <input name="name" placeholder="Name" required className="field" style={field} />
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email*"
+                  required
+                  className="field"
+                  style={field}
+                />
+                <div
+                  className="field-wrap"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: '1px solid #E6D9D6',
+                    borderRadius: 12,
+                    background: '#FCFAFA',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '0 10px 0 14px',
+                      fontSize: 15,
+                      fontWeight: 700,
+                      whiteSpace: 'nowrap',
+                      borderRight: '1px solid #EADBD8',
+                    }}
+                  >
+                    <UKFlag w={18} /> +44
+                  </span>
+                  <input
+                    name="phone"
+                    placeholder="Phone"
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      padding: '14px 12px',
+                      fontSize: 15,
+                      width: '100%',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
                 <textarea
                   name="description"
-                  placeholder="Description"
+                  placeholder="Purpose and Instructions"
                   rows={3}
                   className="field"
                   style={{ ...field, resize: 'vertical', fontFamily: 'inherit' }}
                 />
-                <label
-                  className="upload-box"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 6,
-                    padding: '26px 16px',
-                    border: '1.5px dashed #D8C7C3',
-                    borderRadius: 12,
-                    background: '#FCFAFA',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                  }}
-                >
-                  <span style={{ fontSize: 26, color: '#B0857E' }}>🗂</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#3A3634' }}>
-                    Click or drag files to this area to upload.
-                  </span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#A79F9A' }}>
-                    You can upload up to 10 files.
-                  </span>
-                  <input name="files" type="file" multiple style={{ display: 'none' }} />
-                </label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ fontSize: 16, fontWeight: 800, color: '#1C1C1C' }}>
                     {cap.a} + {cap.b} =
