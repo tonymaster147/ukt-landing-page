@@ -968,6 +968,17 @@ const heading = {
 /*  3. Official trust logos                                            */
 /* ------------------------------------------------------------------ */
 
+const acceptedBy = [
+  'UK Home Office',
+  'UKVI (Visas & Immigration)',
+  'HM Courts & Tribunals',
+  'HM Passport Office',
+  'UK ENIC',
+  'DVLA',
+  'UCAS & UK Universities',
+  'NHS',
+]
+
 function OfficialTrust() {
   return (
     <section style={{ padding: '70px 0', background: '#fff' }}>
@@ -987,16 +998,50 @@ function OfficialTrust() {
         >
           Accepted &amp; trusted by official UK institutions
         </p>
-        <h2 style={{ ...heading, marginBottom: 40 }}>
-          Government-standard Certified Translation
+        <h2 style={{ ...heading, marginBottom: 26 }}>
+          100% Accepted by All UK Government Bodies &amp; Authorities
         </h2>
+
+        {/* Accepted-by list */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 10,
+            marginBottom: 36,
+          }}
+        >
+          {acceptedBy.map((b) => (
+            <span
+              key={b}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 7,
+                background: '#FBF3F1',
+                border: '1px solid #F1E1DE',
+                borderRadius: 999,
+                padding: '9px 16px',
+                fontSize: 14,
+                fontWeight: 700,
+                color: '#3A3634',
+              }}
+            >
+              <span style={{ color: '#1F8A5B', fontWeight: 900 }}>✓</span>
+              {b}
+            </span>
+          ))}
+        </div>
+
+        {/* Institution logos */}
         <div
           className="grid-3"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3,1fr)',
             gap: 24,
-            marginBottom: 38,
+            marginBottom: 26,
           }}
         >
           {data.trustLogos.map((lg) => (
@@ -1021,7 +1066,29 @@ function OfficialTrust() {
             </div>
           ))}
         </div>
-        <CTA>Get a Government-Standard Certified Quote</CTA>
+
+        {/* Certification note */}
+        <p
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 15,
+            fontWeight: 700,
+            color: '#3A3634',
+            margin: '0 0 26px',
+          }}
+        >
+          <span style={{ color: '#1F8A5B', fontWeight: 900 }}>✓</span>
+          Includes Official Certification Stamp, Translator Declaration &amp; Credentials
+        </p>
+
+        <div>
+          <CTA>Get Your Guaranteed Quote</CTA>
+        </div>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#8A857F', margin: '14px 0 0' }}>
+          🔒 100% Home Office Compliant • Delivered in 24 Hours
+        </p>
       </div>
     </section>
   )
