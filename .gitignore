@@ -2,8 +2,6 @@ node_modules
 dist
 dist-ssr
 dist-server
-dist-test
-dist-server-test
 *.local
 .DS_Store
 .vite

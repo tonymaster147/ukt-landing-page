@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:test": "vite --config vite.config.test.js",
     "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-server && node prerender.js",
-    "build:test": "vite build --config vite.config.test.js && vite build --ssr src-test/entry-server.jsx --outDir dist-server-test && node prerender-test.js",
     "build:client": "vite build",
     "preview": "vite preview"
   },
