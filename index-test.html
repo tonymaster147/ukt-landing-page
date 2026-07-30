@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://www.translations.co.uk/wp-content/uploads/2016/08/cropped-favicon.png"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="description"
+      content="Need professional translation services UK? Hire professional translators and interpret or translate for localisation services. We have certified translators."
+    />
+    <title>Professional Translation Services UK | Best Translation Agency</title>
+    <!-- Self-hosted Poppins — preload the LCP heading weight for a fast first paint. -->
+
+    <!-- Google Tag Manager (data layer initialised early; the container loads deferred below) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+    </script>
+
+    <!--
+      Third-party scripts (Google Tag Manager, LiveChat, Clarity, Clicky) are loaded AFTER
+      the page renders — on first user interaction or shortly after load — so they don't
+      block LCP/FCP. They still load for essentially every real session.
+    -->
+    <script>
+      (function () {
+        var loaded = false;
+        function loadThirdParty() {
+          if (loaded) return;
+          loaded = true;
+
+          /* Google Tag Manager */
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          var gtm = document.createElement('script');
+          gtm.async = true;
+          gtm.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-5H2BZD6L';
+          document.head.appendChild(gtm);
+
+          /* Google Ads (gtag.js) */
+          window.gtag = window.gtag || function () { dataLayer.push(arguments); };
+          var gt = document.createElement('script');
+          gt.async = true;
+          gt.src = 'https://www.googletagmanager.com/gtag/js?id=AW-17477274320';
+          document.head.appendChild(gt);
+          gtag('js', new Date());
+          gtag('config', 'AW-17477274320');
+
+          /* Microsoft Clarity */
+          (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+          })(window, document, 'clarity', 'script', 'd9haspp1pr');
+
+          /* Clicky */
+          var cl = document.createElement('script');
+          cl.async = true;
+          cl.src = '//static.getclicky.com/101376639.js';
+          document.body.appendChild(cl);
+
+          /* LiveChat */
+          window.__lc = window.__lc || {};
+          window.__lc.license = 3946801;
+          var lc = document.createElement('script');
+          lc.async = true;
+          lc.src = 'https://cdn.livechatinc.com/tracking.js';
+          document.head.appendChild(lc);
+        }
+
+        var evts = ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'];
+        function onFirst() {
+          loadThirdParty();
+          evts.forEach(function (e) { window.removeEventListener(e, onFirst); });
+        }
+        evts.forEach(function (e) { window.addEventListener(e, onFirst, { passive: true }); });
+
+        // Fallbacks so non-interacting sessions still get tracked.
+        setTimeout(loadThirdParty, 3500);
+        window.addEventListener('load', function () { setTimeout(loadThirdParty, 2500); });
+      })();
+    </script>
+
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-5H2BZD6L"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <noscript>
+      <p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101376639ns.gif" /></p>
+      <p>
+        <a href="https://www.livechatinc.com/chat-with/3946801/">Chat with us</a>, powered by
+        <a href="https://www.livechatinc.com/?welcome" rel="noopener" target="_blank">LiveChat</a>
+      </p>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src-test/main.jsx"></script>
+  </body>
+</html>
