@@ -268,6 +268,15 @@ function Header() {
 // Random single-digit operand (1-9) for the math captcha.
 const randDigit = () => Math.floor(Math.random() * 9) + 1
 
+// Normalise a UK phone number to E.164 (+447…) for Google Enhanced Conversions.
+function toE164UK(raw) {
+  const d = String(raw || '').replace(/\D/g, '')
+  if (!d) return ''
+  if (d.startsWith('44')) return '+' + d
+  if (d.startsWith('0')) return '+44' + d.slice(1)
+  return '+44' + d
+}
+
 function QuoteForm() {
   const [step, setStep] = useState(1)
   const [step1Data, setStep1Data] = useState({})
@@ -339,6 +348,21 @@ function QuoteForm() {
       const res = await fetch(SUBMIT_ENDPOINT, { method: 'POST', body: fd })
       const data = await res.json()
       if (data.success) {
+        // Enhanced Conversions: stash normalised email/phone so GTM can read them
+        // on the /thank-you-two/ page (same origin) and attach to the conversion.
+        const emailNorm = (step1Data.email || '').trim().toLowerCase()
+        const phoneNorm = toE164UK(step1Data.phone)
+        try {
+          sessionStorage.setItem('lead_email', emailNorm)
+          sessionStorage.setItem('lead_phone', phoneNorm)
+        } catch (e) {
+          /* sessionStorage may be unavailable; ignore */
+        }
+        window.dataLayer = window.dataLayer || []
+        window.dataLayer.push({
+          event: 'lead_submit',
+          user_data: { email: emailNorm, phone_number: phoneNorm },
+        })
         window.location.href = THANK_YOU_URL
       } else {
         setSubmitError(data.message || 'Something went wrong. Please try again.')
