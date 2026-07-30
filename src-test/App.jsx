@@ -742,44 +742,73 @@ function Hero() {
           <h1
             className="h1-hero"
             style={{
-              fontSize: 48,
-              lineHeight: 1.08,
+              fontSize: 46,
+              lineHeight: 1.1,
               fontWeight: 700,
               letterSpacing: '-1.2px',
-              margin: '0 0 20px',
+              margin: '0 0 18px',
             }}
           >
-            Certified &amp; Professional{' '}
-            <span style={{ color: '#E8382B' }}>Translation Services</span> | UK Translation Agency
+            Certified UK Document Translations with{' '}
+            <span style={{ color: '#E8382B' }}>100% Acceptance Rate</span>
           </h1>
           <p
             style={{
-              fontSize: 19,
+              fontSize: 18,
               lineHeight: 1.55,
               color: '#55504E',
-              maxWidth: 520,
-              margin: '0 0 28px',
+              maxWidth: 540,
+              margin: '0 0 22px',
             }}
           >
-            With a 100% approval rate, we've offered authority-compliant, professional translation
-            from just £15 across 200+ language pairs for years. Reach us now at{' '}
-            <a
-              href={`tel:${PHONE_TEL}`}
-              style={{ color: '#E8382B', fontWeight: 700, textDecoration: 'none' }}
-            >
-              {PHONE}
-            </a>
-            .
+            Fast, official document translations accepted by the UK Home Office, courts,
+            universities, and UKVI. Fast, accurate, and translated by human experts.
           </p>
-          <div
+          <ul
             style={{
+              listStyle: 'none',
+              margin: '0 0 20px',
+              padding: 0,
               display: 'flex',
-              alignItems: 'center',
-              gap: 16,
-              flexWrap: 'wrap',
-              marginBottom: 30,
+              flexDirection: 'column',
+              gap: 11,
             }}
           >
+            {[
+              'UK Government Accepted',
+              'Same-Day & 24-Hour Delivery',
+              'Human Certified Translators',
+              'Starting from £25 (No Hidden Fees)',
+            ].map((item) => (
+              <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span
+                  style={{
+                    flexShrink: 0,
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    background: '#E7F6ED',
+                    color: '#1F8A5B',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 13,
+                    fontWeight: 900,
+                  }}
+                >
+                  ✓
+                </span>
+                <span style={{ fontSize: 16, fontWeight: 600, color: '#3A3634' }}>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 26 }}>
+            <Stars size={18} spacing={1} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: '#1C1C1C' }}>
+              Rated 4.9/5 by 2,000+ UK Customers
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
             <a
               href={QUOTE_URL}
               className="btn-primary"
@@ -788,24 +817,32 @@ function Hero() {
                 textDecoration: 'none',
                 color: '#fff',
                 fontWeight: 800,
-                fontSize: 18,
-                padding: '17px 34px',
+                fontSize: 17,
+                padding: '16px 30px',
                 border: 'none',
                 borderRadius: 999,
                 cursor: 'pointer',
                 boxShadow: '0 10px 24px rgba(232,56,43,0.28)',
               }}
             >
-              Get My Free Quote
+              Upload Your Document
             </a>
-            <a href={`tel:${PHONE_TEL}`} style={{ fontWeight: 800, fontSize: 16, color: '#1C1C1C' }}>
-              or call {PHONE}
+            <a
+              href={`tel:${PHONE_TEL}`}
+              className="btn-ghost"
+              style={{
+                display: 'inline-block',
+                textDecoration: 'none',
+                fontWeight: 800,
+                fontSize: 16,
+                padding: '14px 26px',
+                border: '2px solid #E8382B',
+                borderRadius: 999,
+                cursor: 'pointer',
+              }}
+            >
+              Talk to an Expert
             </a>
-          </div>
-          <div style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
-            {ratingBadge('uploads/G.webp', 'Google', '5/5', 'Google')}
-            {ratingBadge('uploads/T.webp', 'Trustpilot', '4.9/5', 'Trustpilot')}
-            {ratingBadge('uploads/S.webp', 'SmartCustomer', '4.9/5', 'SmartCustomer')}
           </div>
         </div>
 
