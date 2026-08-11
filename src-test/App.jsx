@@ -3997,10 +3997,9 @@ export default function App() {
       <TrustReasons />
       <TranslationSamples />
       <LanguageReach />
-      <SocialProof />
       {/* Removed from the page (components kept in this file so they can be
-          restored by re-adding a single line): Solutions, WhyChoose, Samples,
-          TechLocalisation, Languages, ISO, Process. */}
+          restored by re-adding a single line): Solutions, WhyChoose,
+          SocialProof, Samples, TechLocalisation, Languages, ISO, Process. */}
       <FAQ />
       <Footer />
       <MobileBar />
