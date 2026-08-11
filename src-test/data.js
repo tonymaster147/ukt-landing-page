@@ -9,11 +9,17 @@ export const WHATSAPP_URL =
 // Every call-to-action points here.
 export const QUOTE_URL = 'https://www.translations.co.uk/quote/'
 
+// LiveChat direct link — used by "Talk to an Expert" / "Talk to a Specialist".
+export const LIVECHAT_URL = 'https://direct.lc.chat/3946801/18'
+
 // Quote form submission: our own PHP endpoint on the WordPress server.
 // It stores files in /files_upload and inserts the lead into the DB table.
 // Set this to wherever you upload the /api folder (see api/README.md).
+// NOTE: the /api folder is deployed at /translation-agency/api/ on the server.
+// It is NOT present under /translation-agency-test-only/, which is why the form
+// previously failed. Upload /api there too if you want test leads kept separate.
 export const SUBMIT_ENDPOINT =
-  'https://www.translations.co.uk/translation-agency-test-only/api/submit.php'
+  'https://www.translations.co.uk/translation-agency/api/submit.php'
 
 // Where the visitor is sent after a successful submission.
 export const THANK_YOU_URL = 'https://www.translations.co.uk/thank-you-two/'
@@ -26,10 +32,19 @@ export const trustStrip = [
   { k: 'ISO', v: 'Guaranteed quality', icon: 'uploads/icons/0105.png' },
 ]
 
+/* Institution logos shown in the "Accepted by" section.
+   `label` is rendered as a text tile whenever the image file is missing,
+   so dropping the real file into public/uploads/ upgrades the tile with
+   no code change. */
 export const trustLogos = [
-  { src: 'uploads/Gov.webp', alt: 'GOV.UK' },
-  { src: 'uploads/Hm-courts.webp', alt: 'HM Courts & Tribunals Service' },
-  { src: 'uploads/NHS-1.webp', alt: 'NHS' },
+  { src: 'uploads/logos/home-office.png', alt: 'UK Home Office', label: 'UK Home Office' },
+  { src: 'uploads/logos/ukvi.png', alt: 'UK Visas & Immigration', label: 'UKVI' },
+  { src: 'uploads/logos/hm-courts.png', alt: 'HM Courts & Tribunals Service', label: 'HM Courts & Tribunals' },
+  { src: 'uploads/logos/hm-passport-office.png', alt: 'HM Passport Office', label: 'HM Passport Office' },
+  { src: 'uploads/logos/uk-enic.png', alt: 'UK ENIC', label: 'UK ENIC' },
+  { src: 'uploads/logos/dvla.png', alt: 'DVLA', label: 'DVLA' },
+  { src: 'uploads/logos/ucas.png', alt: 'UCAS & UK Universities', label: 'UCAS & UK Universities' },
+  { src: 'uploads/logos/nhs.png', alt: 'NHS', label: 'NHS' },
 ]
 
 export const certifiedServices = [
@@ -147,14 +162,357 @@ export const brandLogos = [
   { src: 'uploads/NHS-1.webp', alt: 'NHS' },
 ]
 
-export const proFeatures = [
-  'Covers technical, legal, medical and financial content.',
-  'Handled by specialists with domain-specific knowledge.',
-]
+export const languageReach = {
+  title: 'Translate Documents Into 200+ Languages',
+  sub: 'Certified, human-translated coverage across every major region — accepted by UK government bodies and businesses worldwide.',
+  note: 'Official UKVI Accepted',
+  moreLabel: 'and more',
+  regions: [
+    {
+      icon: 'globe',
+      name: 'European Languages',
+      langs: [
+        'Spanish',
+        'French',
+        'German',
+        'Italian',
+        'Portuguese',
+        'Polish',
+        'Romanian',
+        'Dutch',
+        'Greek',
+        'Ukrainian',
+        'Serbo-Croatian',
+      ],
+    },
+    {
+      icon: 'globe',
+      name: 'Asian Languages',
+      langs: [
+        'Mandarin Chinese',
+        'Japanese',
+        'Korean',
+        'Hindi',
+        'Bengali',
+        'Vietnamese',
+        'Thai',
+        'Urdu',
+        'Punjabi',
+        'Tagalog',
+      ],
+    },
+    {
+      icon: 'compass',
+      name: 'Middle Eastern Languages',
+      langs: ['Arabic', 'Farsi/Persian', 'Hebrew', 'Turkish', 'Kurdish', 'Pashto', 'Dari'],
+    },
+    {
+      icon: 'globe',
+      name: 'African Languages',
+      langs: ['Swahili', 'Amharic', 'Yoruba', 'Somali', 'Hausa', 'Zulu', 'Tigrinya'],
+    },
+  ],
+  cta: 'Need Another Language? Get a Quote',
+}
 
-export const certFeatures = [
-  'Certified translations for legal, immigration and official purposes.',
-  'Includes certification with a stamp and signature.',
+export const translationSamples = {
+  title: 'Translation Samples',
+  sub: 'Inspect officially certified, UK Home Office-compliant document layouts with stamped translator credentials.',
+  tabs: [
+    'Birth Certificate',
+    'Marriage Certificate',
+    'Driving Licence',
+    'Academic Transcript',
+    'Legal Contract',
+    'Medical Report',
+  ],
+  cards: [
+    {
+      kicker: 'Certified Translation',
+      badge: 'Passport Office Approved',
+      tone: 'green',
+      footer: 'Official Seal & Credentials',
+      icon: 'stamp',
+      title: 'CIOL Translation',
+      pair: 'English → Thai',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/english-to-thai-ciol-certified-after-and-before.pdf',
+    },
+    {
+      kicker: 'Official Record',
+      badge: 'Courts & Registrars',
+      tone: 'blue',
+      footer: 'Signed Certification Statement',
+      icon: 'passport',
+      title: 'ITI Translation',
+      pair: 'Spanish → English',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/certified-translation-from-spanish-to-english-after-and-before.pdf',
+    },
+    {
+      kicker: 'DVLA Compliant',
+      badge: 'DVLA Validated',
+      tone: 'amber',
+      footer: 'Official DVLA Format',
+      icon: 'licence',
+      title: 'NAATI Certified',
+      pair: 'Pashto → English',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/pashto-to-english-standard-translation-after-and-before.pdf',
+    },
+    {
+      kicker: 'UCAS & ENIC Approved',
+      badge: 'University Standards',
+      tone: 'indigo',
+      footer: 'Grade Scale Alignment',
+      icon: 'cap',
+      title: 'Standard Translation',
+      pair: 'English → Polish',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/english-to-polish-standard-translation-after-and-before.pdf',
+    },
+    {
+      kicker: 'Court Recognized',
+      badge: 'Solicitor Verified',
+      tone: 'red',
+      footer: 'Binding Legal Accuracy',
+      icon: 'gavel',
+      title: 'NAATI Certified',
+      pair: 'Spanish → English',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/certified-translation-from-spanish-to-english-after-and-before.pdf',
+    },
+    {
+      kicker: 'Medical Accuracy',
+      badge: 'NHS & Clinical',
+      tone: 'teal',
+      footer: 'Clinical Terminology',
+      icon: 'briefcase',
+      title: 'ITI Translation',
+      pair: 'Russian → English',
+      // No Russian → English sample PDF supplied yet — button renders inactive.
+      url: null,
+    },
+  ],
+}
+
+export const trustReasons = {
+  title: 'Why Applicants & Businesses Trust Us',
+  sub: 'We don’t just translate words—we eliminate application risks, speed up approvals, and guarantee acceptance across all official UK authorities.',
+  cards: [
+    {
+      icon: 'personCheck',
+      title: 'Qualified Native Human Translators',
+      text: 'Machine and automated translations often misinterpret legal nuances, leading to costly document rejections. Our qualified, native-speaking linguists ensure 100% contextual accuracy, exact terminology matching, and flawless formatting tailored to official UK standards.',
+    },
+    {
+      icon: 'stamp',
+      title: '100% Official UK Certification',
+      text: 'Every document comes complete with an official certification statement, translator credentials, company seal, and direct contact details. Fully recognized by the UK Home Office, UKVI, HM Courts, universities, and government bodies—guaranteed to be accepted on the first submission.',
+    },
+    {
+      icon: 'truck',
+      title: 'Same-Day & Express Turnaround',
+      text: 'Never miss an urgent visa application deadline or court hearing date. Receive fully certified digital PDF copies in your inbox in as little as 24 hours (with same-day express options available), ready for immediate online submission.',
+    },
+    {
+      icon: 'tag',
+      title: 'Clear, Upfront Pricing — No Hidden Fees',
+      text: 'What you see is what you pay. Standard document rates start at £15, and official certified translations start at £25, with zero unexpected per-word surcharges or hidden express fees added at checkout.',
+    },
+    {
+      icon: 'shieldLock',
+      title: 'ISO-Accredited Quality & Security',
+      text: 'Your sensitive legal, financial, and personal data is protected under strict bank-grade confidentiality and data protection standards. Our ISO-compliant procedures guarantee rigorous multi-stage quality checks before any file reaches your hands.',
+    },
+    {
+      icon: 'headset',
+      title: 'Dedicated UK-Based Customer Care',
+      text: 'Get real-time updates and quick answers whenever you need them. Our responsive UK-based support team is available around the clock via live chat and email to assist with urgent updates, custom requests, and order tracking.',
+    },
+  ],
+  barTitle: 'Get Your Fast Quote Now',
+  barNote: 'Secure Payment Options  •  No Hidden Fees',
+  cta: 'Request Fast Quote',
+}
+
+export const acceptance = {
+  title: 'Need Your Translation Accepted the First Time?',
+  sub: 'A single formatting error or uncertified stamp can delay your application for weeks. We guarantee 100% acceptance across all UK authorities so you submit with total confidence.',
+  cards: [
+    {
+      icon: 'passport',
+      title: 'Visa & Immigration Documents',
+      badge: '100% acceptance guarantee by UKVI, Home Office, & Border Force.',
+      text: 'Includes signed translator credentials and official certification stamps required for immediate processing.',
+    },
+    {
+      icon: 'cap',
+      title: 'University & UCAS Transcripts',
+      badge: 'Accepted by UCAS, UK ENIC, & All UK Universities.',
+      text: 'Perfectly structured degree certificates, transcripts, and diplomas formatted to meet strict academic admissions standards.',
+    },
+    {
+      icon: 'baby',
+      title: 'Birth Certificate Translation',
+      badge: 'Accepted by Passport Office, General Register Office, & Local Councils.',
+      text: 'Flawless, word-for-word certified translations for passport applications, registry offices, and legal identity verification.',
+    },
+    {
+      icon: 'rings',
+      title: 'Marriage & Divorce Certificates',
+      badge: 'Recognized by UK Courts, Registrars, & Government Bodies.',
+      text: 'Officially certified for legal name changes, spousal visas, and official marital status updates across the UK.',
+    },
+    {
+      icon: 'licence',
+      title: 'Driving Licence Translation',
+      badge: 'Accepted by the DVLA & UK Insurance Providers.',
+      text: "Accurate, official translations of overseas driver's licences for seamless DVLA exchanges and legal UK driving compliance.",
+    },
+    {
+      icon: 'gavel',
+      title: 'Legal & Court Documentation',
+      badge: 'Court-Recognised & Fully Validated.',
+      text: 'Fully compliant translations for solicitor submissions, court proceedings, probate, and binding legal agreements.',
+    },
+    {
+      icon: 'briefcase',
+      title: 'Business & Commercial Documentation',
+      badge: 'Ready for Banking, Companies House, & Commercial Deals.',
+      text: 'High-precision translation of articles of association, financial statements, and business contracts by industry specialists.',
+    },
+  ],
+  barTitle: 'Translate My Document Now',
+  barNote: '100% Acceptance Guarantee  •  Delivered in 24 Hours  •  Starting at £25',
+  cta: 'Get Started Right Now',
+}
+
+export const comparison = {
+  title: 'Not All Translation Services Are Equal',
+  kicker: 'This is how Translations.co.uk sets the standards',
+  lead: 'Don’t risk document rejection — see why customers trust us for official UK submissions.',
+  cols: {
+    feature: 'Feature',
+    us: 'Translations.co.uk',
+    them: 'Typical Agencies',
+    why: 'Why it matters to you',
+  },
+  cta: 'Get Your Guaranteed Quote Now',
+  footnote: 'Fast 24-Hour Delivery • 100% Home Office Compliant',
+  rows: [
+    {
+      feature: '100% Home Office Acceptance',
+      us: 'Guaranteed',
+      them: 'Sometimes',
+      tone: 'warn',
+      why: 'Prevents visa, court, or legal submission rejections.',
+    },
+    {
+      feature: 'Certified Human Translators',
+      us: 'Always',
+      them: 'Mixed / AI-Heavy',
+      tone: 'warn',
+      why: 'Guarantees accuracy and valid certification stamps.',
+    },
+    {
+      feature: '24-Hour Express Delivery',
+      us: 'Standard',
+      them: '2–5 Days',
+      tone: 'bad',
+      why: 'Avoids missed deadlines for urgent applications.',
+    },
+    {
+      feature: 'Upfront, Transparent Rates',
+      us: 'From £15 / £25',
+      them: 'Hidden Fees',
+      tone: 'bad',
+      why: 'No unexpected per-word surcharges at checkout.',
+    },
+    {
+      feature: 'ISO-Certified Quality Standard',
+      us: 'Yes',
+      them: 'No',
+      tone: 'bad',
+      why: 'Ensures strict data security and translation checks.',
+    },
+    {
+      feature: 'Dedicated UK-Based Support',
+      us: 'Direct Call / Email',
+      them: 'Slow Bot Support',
+      tone: 'bad',
+      why: 'Fast assistance when you need urgent updates.',
+    },
+  ],
+}
+
+export const specialistBand = {
+  title: 'Need a custom volume discount or complex legal translation?',
+  linkText: 'Talk to a Specialist',
+  sub: 'or upload your document for an immediate quote. No hidden fees.',
+  cta: 'Upload Document',
+  badges: [
+    { icon: 'cert', label: 'ISO 17100' },
+    { icon: 'cert', label: 'ISO 18587' },
+    { icon: 'shield', label: 'GDPR Compliance' },
+    { icon: 'human', label: 'Human Translation Only' },
+    { icon: 'award', label: 'Certified Linguists' },
+    { icon: 'lock', label: '100% Confidential Documents' },
+  ],
+}
+
+export const pricingIntro = {
+  title: 'Certified Document Translations from £25 — No Hidden Fees',
+  // Compact assurance strip under the heading (replaces the old paragraph).
+  assurances: [
+    { icon: 'shield', text: 'Guaranteed Quality' },
+    { icon: 'star', text: '98% Customer Satisfaction' },
+    { icon: 'cert', text: 'UK Certified Translators' },
+  ],
+}
+
+export const pricingPlans = [
+  {
+    id: 'professional',
+    name: 'Professional Translation',
+    price: '£15',
+    unit: 'per page',
+    blurb: 'Ideal for commercial, web, and marketing content.',
+    perfectFor: [
+      'Business Documents',
+      'Websites & E-commerce',
+      'User Manuals & Guides',
+      'Marketing Collateral',
+      'Technical Documentation',
+    ],
+    included: [
+      { text: 'Translated by Industry-Expert Human Translators' },
+      { text: 'Rigorous Quality Assurance & Editing' },
+      { text: 'Digital Delivery (PDF / Word)' },
+      { text: 'Turnaround: 24–48 Hours', icon: 'bolt' },
+    ],
+    cta: 'Get Business Quote',
+    featured: false,
+  },
+  {
+    id: 'certified',
+    name: 'Certified Translation',
+    price: '£25',
+    unit: 'per document',
+    badge: 'Most popular — 100% UKVI & Home Office accepted',
+    blurb: 'Officially stamped and court-recognised across the UK.',
+    perfectFor: [
+      'Visas & Immigration (UKVI / Home Office)',
+      'Birth & Marriage Certificates',
+      'Passports & Identification',
+      'Legal Contracts & Court Documents',
+      'Driving Licences & Academic Transcripts',
+    ],
+    included: [
+      { text: '100% Acceptance Guarantee (Home Office, Courts & Universities)', strong: true },
+      { text: 'Official Certification Stamp & Signed Translator Declaration' },
+      { text: 'Qualified & Vetted Human Translators' },
+      { text: 'Digital PDF + Physical Hard Copy (Optional)' },
+      { text: 'Express 24-Hour Delivery Available', icon: 'bolt' },
+    ],
+    cta: 'Instant online quote in 60 seconds',
+    featured: true,
+  },
 ]
 
 export const samples = [
@@ -240,39 +598,35 @@ export const processSteps = [
 
 export const faqData = [
   {
-    q: 'Will my certified translation be accepted by the Home Office, UKVI, and other UK authorities?',
-    a: "Yes. Our certified translations are accepted by the UK Home Office, UKVI, Passport Office, DVLA, HM Courts & Tribunals, NHS, and UK ENIC. Every certified translation includes a signed statement of accuracy, the translator's credentials, and our official stamp — exactly the format UK government bodies require. We maintain a 100% acceptance rate with official institutions.",
+    q: 'Will UKVI accept my translation?',
+    a: "We maintain a 97.58% acceptance rate with UKVI, the Home Office, and other UK government bodies. Every translation includes a signed certificate of accuracy stating the translator's credentials and confirming it's a complete, accurate translation; the format these bodies require. While no translation provider can guarantee acceptance, since the final decision always rests with the receiving authority, in the rare case a translation is rejected on formatting or certification grounds, we'll revise it free of charge.",
   },
   {
-    q: "What's the difference between your £15 and £25 pricing?",
-    a: "Professional translation starts at £15 per page and covers business, technical, legal, and medical content where no official certification is needed. Certified translation starts at £25 per page and includes a signed certificate of accuracy with stamp and signature, required for visa applications, immigration, and official submissions. Not sure which you need? Tell us the purpose in the quote form and we'll confirm before you pay.",
+    q: 'How long does translation take?',
+    a: 'Standard translations typically take 72 hours depending on length, and express same-day delivery is available if you need it sooner.',
   },
   {
-    q: 'How fast can I get my translation?',
-    a: 'Standard documents such as birth certificates, marriage certificates, and driving licences are typically delivered within 6–24 hours. Larger or specialist documents take 1–2 business days. Your exact delivery date is confirmed in your instant quote before you pay — and we deliver on or before that deadline, guaranteed.',
+    q: 'How much does it cost?',
+    a: "Certified document translations start from £25 per page, with no hidden fees; the price you're quoted is the price you pay. Larger projects, business documents, or specialist legal translations are quoted individually, and volume discounts are available.",
   },
   {
-    q: 'Can you translate my birth certificate, marriage certificate, or driving licence?',
-    a: 'Yes — these are our most common orders. We provide certified translations of birth certificates, marriage certificates, driving licences, academic transcripts, bank statements, and passports in 200+ language pairs, usually within 24 hours. Upload your document through the quote form to get your price instantly.',
+    q: 'Can you translate today?',
+    a: "Yes. We offer express same-day service for urgent documents, upload your file and we'll confirm turnaround before you pay.",
   },
   {
-    q: 'Is my translation done by a human or a machine?',
-    a: 'Every certified and official translation is completed 100% by a qualified human linguist — never machine translation. However, for scalable professional translations such as ecommerce, website, and industrial translations, we assign a native-speaking translator with subject expertise, offering machine-assisted human translation. For every translation, we conduct a thorough quality check before delivery, in line with our ISO 17100-certified process.',
+    q: 'Are my files confidential?',
+    a: 'Yes. All documents are handled under strict confidentiality and GDPR compliance, encrypted during upload and storage, and only accessed by the translator assigned to your job. We never share your files with third parties.',
   },
   {
-    q: 'How do I get a quote and place an order?',
-    a: "Fill in the quote form above, upload your document, choose the delivery date and format, and you'll receive an instant quote. Pay securely online, and your translation is delivered as a PDF to your email as per your deadline — with hard copies available on request. The whole process takes under two minutes to start.",
+    q: 'Do you use AI?',
+    a: "No. Every document is translated and certified by a qualified, professional human translator, not machine translation. AI-generated translations aren't accepted for official UK submissions, and we never use them for certified work.",
   },
   {
-    q: 'Are my documents kept confidential?',
-    a: 'Yes. All translators are bound by strict non-disclosure agreements, and your files are handled through secure, encrypted systems. Your documents are never shared, and we comply fully with UK GDPR.',
+    q: 'Can I upload scanned documents?',
+    a: "Yes. We accept scans, photos, and PDFs of your original documents, you don't need an editable file. Just make sure the text is clearly legible.",
   },
   {
-    q: 'Do you provide notarised or sworn translations?',
-    a: "Yes. Alongside standard certified translations, we arrange notarised translations (authenticated by a Public Notary) and sworn translations for countries that require them, such as Spain, France, and Germany. Mention the requirement in your quote request and we'll confirm the right option for your destination authority.",
-  },
-  {
-    q: 'Which languages do you cover?',
-    a: "We translate across 200+ language pairs, including Spanish, German, Ukrainian, Arabic, Hindi, Chinese, Portuguese, and Polish — for both certified and professional purposes. If your language pair isn't listed on this page, request a quote anyway; we almost certainly cover it.",
+    q: 'Do I need notarisation?',
+    a: 'Not usually, most UK government bodies, universities, and employers only require a certified translation, which is included as standard. If your specific use case requires notarisation (for example, some international or legal submissions), we also offer that as an add-on, just let us know when you order.',
   },
 ]

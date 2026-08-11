@@ -1,4 +1,4 @@
-import { useState, useEffect, useId } from 'react'
+import { useState, useEffect, useId, Fragment } from 'react'
 import * as data from './data.js'
 import {
   PHONE,
@@ -8,6 +8,7 @@ import {
   SUBMIT_ENDPOINT,
   THANK_YOU_URL,
   WHATSAPP_URL,
+  LIVECHAT_URL,
 } from './data.js'
 
 const MAX = 1200
@@ -284,9 +285,14 @@ function QuoteForm() {
   const [captchaError, setCaptchaError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  // Fresh challenge generated on load; regenerated on a wrong answer.
-  const [cap, setCap] = useState(() => ({ a: randDigit(), b: randDigit() }))
+  // Deterministic on the server and on the first client render so the
+  // prerendered HTML hydrates without a mismatch; randomised right after mount,
+  // and again on a wrong answer.
+  const [cap, setCap] = useState({ a: 3, b: 4 })
   const newCaptcha = () => setCap({ a: randDigit(), b: randDigit() })
+  useEffect(() => {
+    setCap({ a: randDigit(), b: randDigit() })
+  }, [])
 
   // Step 1 = documents + language pair. Capture them before the step unmounts.
   const goToStep2 = () => {
@@ -349,20 +355,66 @@ function QuoteForm() {
       const res = await fetch(SUBMIT_ENDPOINT, { method: 'POST', body: fd })
       const data = await res.json()
       if (data.success) {
-        // Enhanced Conversions: stash normalised email/phone so GTM can read them
-        // on the /thank-you-two/ page (same origin) and attach to the conversion.
+        /* ---------------- Enhanced Conversions ----------------
+           Google Ads diagnostics asked for "in-page code in addition to
+           Automatic". Automatic detection can't work here because the
+           conversion fires on /thank-you-two/, which has no form fields to
+           scrape — hence 0% coverage. So we hand the Google tag the
+           user-provided data explicitly, normalised the way Google expects:
+           email lower-cased/trimmed, phone in E.164, name split, empty
+           fields omitted entirely (never sent as ''). */
+        const fullName = ((el['name'] && el['name'].value) || '').trim().replace(/\s+/g, ' ')
+        const parts = fullName ? fullName.split(' ') : []
+
+        const userData = {}
+        if (emailNorm) userData.email = emailNorm
+        if (phoneNorm) userData.phone_number = phoneNorm
+        if (parts.length) {
+          userData.address = {
+            first_name: parts[0],
+            last_name: parts.length > 1 ? parts.slice(1).join(' ') : '',
+            country: 'GB',
+          }
+        }
+
+        // Still stash for the thank-you page (same origin) as a fallback.
         try {
           sessionStorage.setItem('lead_email', emailNorm)
           sessionStorage.setItem('lead_phone', phoneNorm)
+          sessionStorage.setItem('lead_user_data', JSON.stringify(userData))
         } catch (e) {
           /* sessionStorage may be unavailable; ignore */
         }
+
         window.dataLayer = window.dataLayer || []
+        // gtag may not exist yet (third-party scripts load lazily). The shim
+        // queues the command so gtag.js applies it as soon as it loads.
+        if (typeof window.gtag !== 'function') {
+          window.gtag = function () {
+            window.dataLayer.push(arguments)
+          }
+        }
+        // In-page enhanced-conversions data for the Google tag.
+        window.gtag('set', 'user_data', userData)
+
+        /* Don't navigate until the tags have had a chance to fire. Previously
+           we redirected on the very next line, so GTM was often killed by the
+           page unload before the conversion tag ran. eventCallback fires once
+           GTM has finished (or hits eventTimeout); the setTimeout guarantees
+           the visitor still reaches the thank-you page if GTM never answers. */
+        let navigated = false
+        const go = () => {
+          if (navigated) return
+          navigated = true
+          window.location.href = THANK_YOU_URL
+        }
         window.dataLayer.push({
           event: 'lead_submit',
-          user_data: { email: emailNorm, phone_number: phoneNorm },
+          user_data: userData,
+          eventCallback: go,
+          eventTimeout: 1500,
         })
-        window.location.href = THANK_YOU_URL
+        setTimeout(go, 1600)
       } else {
         setSubmitError(data.message || 'Something went wrong. Please try again.')
         setSubmitting(false)
@@ -683,6 +735,7 @@ function QuoteForm() {
 /* ------------------------------------------------------------------ */
 
 function Hero() {
+  const narrow = useNarrow(640)
   const ratingBadge = (img, alt, score, name) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <Img
@@ -807,12 +860,22 @@ function Hero() {
               Rated 4.9/5 by 2,000+ UK Customers
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+          {/* On mobile both CTAs go full width and stack, so they line up. */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: narrow ? 'column' : 'row',
+              alignItems: narrow ? 'stretch' : 'center',
+              gap: narrow ? 12 : 14,
+              flexWrap: 'wrap',
+            }}
+          >
             <a
               href={QUOTE_URL}
               className="btn-primary"
               style={{
-                display: 'inline-block',
+                display: 'block',
+                textAlign: 'center',
                 textDecoration: 'none',
                 color: '#fff',
                 fontWeight: 800,
@@ -822,22 +885,27 @@ function Hero() {
                 borderRadius: 999,
                 cursor: 'pointer',
                 boxShadow: '0 10px 24px rgba(232,56,43,0.28)',
+                width: narrow ? '100%' : 'auto',
               }}
             >
               Upload Your Document
             </a>
             <a
-              href={`tel:${PHONE_TEL}`}
+              href={LIVECHAT_URL}
+              target="_blank"
+              rel="noopener"
               className="btn-ghost"
               style={{
-                display: 'inline-block',
+                display: 'block',
+                textAlign: 'center',
                 textDecoration: 'none',
                 fontWeight: 800,
                 fontSize: 16,
-                padding: '14px 26px',
+                padding: narrow ? '16px 26px' : '14px 26px',
                 border: '2px solid #E8382B',
                 borderRadius: 999,
                 cursor: 'pointer',
+                width: narrow ? '100%' : 'auto',
               }}
             >
               Talk to an Expert
@@ -968,102 +1036,72 @@ const heading = {
 /*  3. Official trust logos                                            */
 /* ------------------------------------------------------------------ */
 
-const acceptedBy = [
-  'UK Home Office',
-  'UKVI (Visas & Immigration)',
-  'HM Courts & Tribunals',
-  'HM Passport Office',
-  'UK ENIC',
-  'DVLA',
-  'UCAS & UK Universities',
-  'NHS',
-]
+/* One logo tile. Falls back to a clean wordmark if the image file is
+   missing, so the strip never shows a broken image. */
+function LogoTile({ logo }) {
+  const [failed, setFailed] = useState(!logo.src)
+
+  return (
+    <div
+      style={{
+        height: 104,
+        borderRadius: 16,
+        border: '1px solid #EFE2DF',
+        background: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '18px 20px',
+        textAlign: 'center',
+      }}
+    >
+      {failed ? (
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 800,
+            color: '#5A5450',
+            letterSpacing: '-0.2px',
+            lineHeight: 1.3,
+          }}
+        >
+          {logo.label || logo.alt}
+        </span>
+      ) : (
+        <Img
+          src={logo.src}
+          alt={logo.alt}
+          onError={() => setFailed(true)}
+          style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
+        />
+      )}
+    </div>
+  )
+}
 
 function OfficialTrust() {
   return (
-    <section style={{ padding: '70px 0', background: '#fff' }}>
+    <section style={{ padding: '70px 0 34px', background: '#fff' }}>
       <div
         className="section-pad"
         style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}
       >
-        <p
-          style={{
-            fontWeight: 800,
-            color: '#8A857F',
-            fontSize: 14,
-            letterSpacing: '1.5px',
-            textTransform: 'uppercase',
-            margin: '0 0 8px',
-          }}
-        >
-          Accepted &amp; trusted by official UK institutions
-        </p>
-        <h2 style={{ ...heading, marginBottom: 26 }}>
+        <h2 style={{ ...heading, marginBottom: 36 }}>
           100% Accepted by All UK Government Bodies &amp; Authorities
         </h2>
 
-        {/* Accepted-by list */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: 10,
-            marginBottom: 36,
-          }}
-        >
-          {acceptedBy.map((b) => (
-            <span
-              key={b}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 7,
-                background: '#FBF3F1',
-                border: '1px solid #F1E1DE',
-                borderRadius: 999,
-                padding: '9px 16px',
-                fontSize: 14,
-                fontWeight: 700,
-                color: '#3A3634',
-              }}
-            >
-              <span style={{ color: '#1F8A5B', fontWeight: 900 }}>✓</span>
-              {b}
-            </span>
-          ))}
-        </div>
-
         {/* Institution logos */}
         <div
-          className="grid-3"
+          className="grid-4"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3,1fr)',
-            gap: 24,
+            gridTemplateColumns: 'repeat(4,1fr)',
+            gap: 16,
             marginBottom: 26,
           }}
         >
           {data.trustLogos.map((lg) => (
-            <div
-              key={lg.alt}
-              style={{
-                height: 132,
-                borderRadius: 16,
-                border: '1px solid #EFE2DF',
-                background: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '24px 32px',
-              }}
-            >
-              <Img
-                src={lg.src}
-                alt={lg.alt}
-                style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
-              />
-            </div>
+            <LogoTile key={lg.alt} logo={lg} />
           ))}
         </div>
 
@@ -1088,27 +1126,6 @@ function OfficialTrust() {
         </div>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#8A857F', margin: '14px 0 0' }}>
           🔒 100% Home Office Compliant • Delivered in 24 Hours
-        </p>
-      </div>
-    </section>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/*  4. Intro                                                           */
-/* ------------------------------------------------------------------ */
-
-function Intro() {
-  return (
-    <section style={{ padding: '20px 0 60px', background: '#fff' }}>
-      <div
-        className="section-pad"
-        style={{ maxWidth: 820, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}
-      >
-        <p style={{ fontSize: 21, lineHeight: 1.6, color: '#55504E', fontWeight: 600, margin: 0 }}>
-          For over a decade, businesses, individuals and government bodies across the UK have relied
-          on us for accurate, authority compliant translation. Every project is handled by qualified
-          human linguists, not just machines, and quality checked before delivery.
         </p>
       </div>
     </section>
@@ -1614,168 +1631,1694 @@ function SocialProof() {
 /*  8. Pricing                                                         */
 /* ------------------------------------------------------------------ */
 
-function Pricing() {
+const RED = '#E8382B'
+const GREEN = '#1F8A5B'
+
+function PlanLabel({ children }) {
   return (
-    <section style={{ padding: '88px 0', background: '#fff' }}>
-      <div className="section-pad" style={{ maxWidth: 960, margin: '0 auto', padding: '0 32px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={heading}>Quality translation in Your Budget</h2>
-          <p style={{ fontSize: 18, color: '#55504E', fontWeight: 600, margin: 0 }}>
-            To hire professional translator services, call us at{' '}
-            <a href={`tel:${PHONE_TEL}`} style={{ color: '#E8382B', fontWeight: 700 }}>
-              {PHONE}
-            </a>
-            , contact our LiveChat support, or email us at{' '}
-            <a href={`mailto:${EMAIL}`} style={{ color: '#E8382B', fontWeight: 700 }}>
-              {EMAIL}
-            </a>
-            .
-          </p>
-        </div>
-        <div
-          className="grid-2"
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 26 }}
-        >
-          {/* Professional */}
-          <div
-            className="card-pad"
-            style={{
-              background: '#FBF8F7',
-              borderRadius: 22,
-              padding: 36,
-              border: '1px solid #EEE4E1',
-            }}
-          >
-            <div
+    <div
+      style={{
+        fontSize: 12,
+        fontWeight: 800,
+        letterSpacing: '1.2px',
+        textTransform: 'uppercase',
+        color: '#A79F9A',
+        margin: '0 0 14px',
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function PlanCard({ plan }) {
+  const featured = plan.featured
+  const narrow = useNarrow(880)
+
+  return (
+    <div
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#fff',
+        borderRadius: 26,
+        overflow: 'hidden',
+        border: featured ? `2px solid ${RED}` : '1px solid #EEE4E1',
+        boxShadow: featured
+          ? '0 34px 74px rgba(232,56,43,0.24)'
+          : '0 12px 32px rgba(58,54,52,0.06)',
+        transform: featured && !narrow ? 'translateY(-16px)' : 'none',
+        zIndex: featured ? 1 : 0,
+      }}
+    >
+      {/* ---- Header cap: solid red on the featured plan ---- */}
+      <div
+        className="card-pad"
+        style={{
+          background: featured ? 'linear-gradient(135deg,#F04A3D 0%,#C22A20 100%)' : '#FBF8F7',
+          borderBottom: featured ? 'none' : '1px solid #F1E7E4',
+          padding: '26px 30px 30px',
+          textAlign: 'center',
+        }}
+      >
+        {/* BADGE — full line from the brief. The unbadged plan gets a spacer
+            of the same height so both price rows stay on the same baseline. */}
+        {plan.badge ? (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+            <span
               style={{
-                fontWeight: 800,
-                color: '#8A857F',
-                fontSize: 14,
-                letterSpacing: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: '#fff',
+                color: RED,
+                borderRadius: 999,
+                padding: '10px 22px',
+                fontSize: 12.5,
+                fontWeight: 900,
+                letterSpacing: '1.1px',
                 textTransform: 'uppercase',
-                marginBottom: 10,
+                lineHeight: 1.35,
+                textAlign: 'center',
+                maxWidth: '100%',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.22)',
               }}
             >
-              Professional
+              <span style={{ fontSize: 15, flexShrink: 0 }}>⭐</span>
+              {plan.badge}
+            </span>
+          </div>
+        ) : (
+          <div aria-hidden style={{ height: 42, marginBottom: 18 }} />
+        )}
+
+        <h3
+          style={{
+            fontSize: 19,
+            fontWeight: 800,
+            margin: '0 0 14px',
+            color: featured ? 'rgba(255,255,255,0.92)' : '#3A3634',
+            letterSpacing: '-0.2px',
+          }}
+        >
+          {plan.name}
+        </h3>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'center',
+            gap: 8,
+            marginBottom: 14,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: featured ? 'rgba(255,255,255,0.8)' : '#8A857F',
+            }}
+          >
+            From
+          </span>
+          <span
+            style={{
+              fontSize: 54,
+              fontWeight: 900,
+              letterSpacing: '-2.4px',
+              lineHeight: 1,
+              color: featured ? '#fff' : '#1C1C1C',
+            }}
+          >
+            {plan.price}
+          </span>
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: featured ? 'rgba(255,255,255,0.8)' : '#8A857F',
+            }}
+          >
+            {plan.unit}
+          </span>
+        </div>
+
+        <p
+          style={{
+            fontSize: 15,
+            fontWeight: 600,
+            margin: 0,
+            lineHeight: 1.5,
+            color: featured ? 'rgba(255,255,255,0.9)' : '#55504E',
+          }}
+        >
+          {plan.blurb}
+        </p>
+      </div>
+
+      {/* ---- Body ---- */}
+      <div
+        className="card-pad"
+        style={{ padding: '28px 30px 30px', display: 'flex', flexDirection: 'column', flex: 1 }}
+      >
+      {/* Perfect for */}
+      <PlanLabel>Perfect for</PlanLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+        {plan.perfectFor.map((f) => (
+          <div
+            key={f}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 10,
+              fontSize: 15,
+              fontWeight: 600,
+              color: '#3A3634',
+              lineHeight: 1.45,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: featured ? RED : '#C9BFBB',
+                marginTop: 8,
+                flexShrink: 0,
+              }}
+            />
+            {f}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ height: 1, background: '#F1E7E4', margin: '0 0 22px' }} />
+
+      {/* What's included */}
+      <PlanLabel>What’s included</PlanLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+        {plan.included.map((f) => {
+          const bolt = f.icon === 'bolt'
+          return (
+            <div
+              key={f.text}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+                fontSize: 15,
+                fontWeight: f.strong ? 800 : 600,
+                color: '#3A3634',
+                lineHeight: 1.45,
+              }}
+            >
+              <span
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  flexShrink: 0,
+                  marginTop: 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 11,
+                  fontWeight: 900,
+                  background: bolt ? '#FFF3D6' : '#E5F4EC',
+                  color: bolt ? '#B07C00' : GREEN,
+                }}
+              >
+                {bolt ? '⚡' : '✓'}
+              </span>
+              {f.text}
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#A79F9A', marginBottom: 2 }}>
-              Starting rate
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 18 }}>
-              <span style={{ fontSize: 46, fontWeight: 900, letterSpacing: '-1.5px' }}>£15</span>
-              <span style={{ color: '#8A857F', fontWeight: 700 }}>/ page</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 11, marginBottom: 26 }}>
-              {data.proFeatures.map((f) => (
-                <div
-                  key={f}
-                  style={{ display: 'flex', gap: 9, fontSize: 15, fontWeight: 600, color: '#3A3634' }}
+          )
+        })}
+      </div>
+
+      {/* CTA pinned to the bottom so both cards line up */}
+      <div style={{ marginTop: 'auto' }}>
+        <a
+          href={QUOTE_URL}
+          className={featured ? 'btn-primary' : 'btn-dark'}
+          style={{
+            display: 'block',
+            textAlign: 'center',
+            textDecoration: 'none',
+            width: '100%',
+            color: '#fff',
+            fontWeight: 800,
+            fontSize: 16,
+            padding: 16,
+            border: 'none',
+            borderRadius: 14,
+            cursor: 'pointer',
+          }}
+        >
+          {plan.cta}
+        </a>
+      </div>
+      </div>
+    </div>
+  )
+}
+
+function Pricing() {
+  const narrow = useNarrow(640)
+
+  return (
+    <section
+      style={{ padding: '38px 0 84px', background: 'linear-gradient(180deg,#fff 0%,#FBF3F1 100%)' }}
+    >
+      <div className="section-pad" style={{ maxWidth: 1020, margin: '0 auto', padding: '0 32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 52px' }}>
+          <h2 style={{ ...heading, marginBottom: 18 }}>{data.pricingIntro.title}</h2>
+
+          {/* Assurance strip — compact icon + label row under the heading. */}
+          <div
+            style={{
+              display: 'inline-flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: narrow ? 12 : 26,
+              background: '#FBF6F5',
+              border: '1px solid #F1E7E4',
+              borderRadius: narrow ? 18 : 999,
+              padding: narrow ? '12px 18px' : '11px 24px',
+            }}
+          >
+            {data.pricingIntro.assurances.map((a) => (
+              <span
+                key={a.text}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 14.5,
+                  fontWeight: 700,
+                  color: '#55504E',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span style={{ color: '#1F8A5B', display: 'inline-flex', flexShrink: 0 }}>
+                  <SpecIcon name={a.icon} size={16} />
+                </span>
+                {a.text}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div
+          className="grid-2"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 26,
+            alignItems: 'stretch',
+            marginTop: 18,
+          }}
+        >
+          {data.pricingPlans.map((p) => (
+            <PlanCard key={p.id} plan={p} />
+          ))}
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  8b. Specialist band — dark trust panel under the pricing cards     */
+/* ------------------------------------------------------------------ */
+
+function SpecIcon({ name, size = 19 }) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.9,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  if (name === 'shield')
+    return (
+      <svg {...p}>
+        <path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z" />
+        <path d="M9 12l2 2 4-4" />
+      </svg>
+    )
+  if (name === 'human')
+    return (
+      <svg {...p}>
+        <circle cx="12" cy="8" r="3.4" />
+        <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+      </svg>
+    )
+  if (name === 'award')
+    return (
+      <svg {...p}>
+        <circle cx="12" cy="9" r="5.2" />
+        <path d="M8.6 13.4L7 21l5-2.4L17 21l-1.6-7.6" />
+      </svg>
+    )
+  if (name === 'lock')
+    return (
+      <svg {...p}>
+        <rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2" />
+        <path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" />
+      </svg>
+    )
+  if (name === 'star')
+    return (
+      <svg {...p}>
+        <path d="M12 3.6l2.6 5.3 5.9.85-4.25 4.15 1 5.85L12 17l-5.25 2.75 1-5.85L3.5 9.75l5.9-.85z" />
+      </svg>
+    )
+  /* cert */
+  return (
+    <svg {...p}>
+      <path d="M6 3h9l4 4v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M14.5 3v4.5H19" />
+      <circle cx="11.5" cy="12.5" r="2.4" />
+      <path d="M9.8 15.2L9 20l2.5-1.3L14 20l-.8-4.8" />
+    </svg>
+  )
+}
+
+function SpecialistBand() {
+  const b = data.specialistBand
+  const narrow = useNarrow(880)
+
+  return (
+    <section
+      style={{
+        padding: narrow ? '52px 0' : '68px 0',
+        background: 'linear-gradient(160deg,#16233A 0%,#0C1523 100%)',
+      }}
+    >
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <div>
+          {/* Headline + CTA */}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 22,
+              marginBottom: 30,
+            }}
+          >
+            <div style={{ flex: '1 1 380px' }}>
+              <h2
+                style={{
+                  fontSize: narrow ? 23 : 27,
+                  fontWeight: 800,
+                  letterSpacing: '-0.5px',
+                  color: '#fff',
+                  margin: '0 0 10px',
+                  lineHeight: 1.3,
+                }}
+              >
+                {b.title}
+              </h2>
+              <p style={{ fontSize: 16, fontWeight: 600, color: '#A9B6C9', margin: 0, lineHeight: 1.6 }}>
+                <a
+                  href={LIVECHAT_URL}
+                  target="_blank"
+                  rel="noopener"
+                  style={{ color: '#FF7A6E', fontWeight: 800, textDecoration: 'underline' }}
                 >
-                  <span style={{ color: '#E8382B', fontWeight: 900 }}>✓</span>
-                  {f}
-                </div>
-              ))}
+                  {b.linkText}
+                </a>{' '}
+                {b.sub}
+              </p>
             </div>
             <a
               href={QUOTE_URL}
-              className="btn-dark"
+              className="btn-primary"
               style={{
-                display: 'block',
-                textAlign: 'center',
+                display: 'inline-block',
                 textDecoration: 'none',
-                width: '100%',
                 color: '#fff',
                 fontWeight: 800,
                 fontSize: 16,
-                padding: 15,
-                border: 'none',
-                borderRadius: 12,
-                cursor: 'pointer',
+                padding: '15px 30px',
+                borderRadius: 14,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
-              Get Professional Quote
+              {b.cta}
             </a>
           </div>
 
-          {/* Certified */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.09)', marginBottom: 28 }} />
+
+          {/* Trust badges */}
           <div
-            className="card-pad"
+            className="grid-3"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}
+          >
+            {b.badges.map((x) => (
+              <div
+                key={x.label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                  borderRadius: 14,
+                  padding: '14px 16px',
+                }}
+              >
+                <span
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 11,
+                    flexShrink: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(232,56,43,0.16)',
+                    color: '#FF8074',
+                  }}
+                >
+                  <SpecIcon name={x.icon} />
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: '#EAF0F8', lineHeight: 1.35 }}>
+                  {x.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  8c. Comparison table — "Not all translation services are equal"    */
+/* ------------------------------------------------------------------ */
+
+const CMP_TONES = {
+  good: { bg: 'rgba(45,190,126,0.16)', fg: '#63E0A6', mark: '✓' },
+  warn: { bg: 'rgba(255,186,46,0.15)', fg: '#FFCF6B', mark: '?' },
+  bad: { bg: 'rgba(255,99,84,0.15)', fg: '#FF9083', mark: '✕' },
+}
+
+function CmpBadge({ kind, children, compact }) {
+  const t = CMP_TONES[kind]
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: compact ? 'flex-start' : 'center',
+        gap: compact ? 7 : 8,
+        background: t.bg,
+        color: t.fg,
+        borderRadius: compact ? 11 : 999,
+        padding: compact ? '7px 10px' : '7px 13px',
+        fontSize: compact ? 13 : 14,
+        fontWeight: 800,
+        lineHeight: 1.3,
+      }}
+    >
+      <span
+        style={{
+          width: 17,
+          height: 17,
+          borderRadius: '50%',
+          background: t.fg,
+          color: '#0C1523',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 10,
+          fontWeight: 900,
+          flexShrink: 0,
+          marginTop: compact ? 1 : 0,
+        }}
+      >
+        {t.mark}
+      </span>
+      {children}
+    </span>
+  )
+}
+
+const CMP_COLS = '1.2fr 1fr 1fr 1.35fr'
+
+function Comparison() {
+  const c = data.comparison
+  const narrow = useNarrow(880)
+
+  const cell = { padding: '18px 20px', display: 'flex', alignItems: 'center' }
+  const hdr = {
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: '1.1px',
+    textTransform: 'uppercase',
+    color: '#7E8FA8',
+    alignItems: 'flex-end',
+  }
+
+  return (
+    <section
+      style={{
+        padding: '84px 0 88px',
+        background: 'linear-gradient(180deg,#0C1523 0%,#111D31 100%)',
+        borderTop: '1px solid rgba(255,255,255,0.07)',
+      }}
+    >
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 800, margin: '0 auto 44px' }}>
+          <h2 style={{ ...heading, color: '#fff', marginBottom: 10 }}>{c.title}</h2>
+          <p
             style={{
-              background: '#E8382B',
-              borderRadius: 22,
-              padding: 36,
-              border: '1px solid #E8382B',
-              color: '#fff',
-              position: 'relative',
-              boxShadow: '0 20px 44px rgba(232,56,43,0.28)',
+              fontSize: 17,
+              fontStyle: 'italic',
+              fontWeight: 600,
+              color: '#8FA0B8',
+              margin: '0 0 14px',
             }}
           >
-            <div
-              style={{
-                position: 'absolute',
-                top: 20,
-                right: 24,
-                background: 'rgba(255,255,255,0.2)',
-                borderRadius: 999,
-                padding: '5px 12px',
-                fontSize: 12,
-                fontWeight: 800,
-              }}
-            >
-              Most popular
-            </div>
-            <div
-              style={{
-                fontWeight: 800,
-                color: '#FBD9D5',
-                fontSize: 14,
-                letterSpacing: 1,
-                textTransform: 'uppercase',
-                marginBottom: 10,
-              }}
-            >
-              Certified
-            </div>
-            <div
-              style={{ fontSize: 13, fontWeight: 700, color: '#FBD9D5', opacity: 0.85, marginBottom: 2 }}
-            >
-              Starting rate
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 18 }}>
-              <span style={{ fontSize: 46, fontWeight: 900, letterSpacing: '-1.5px' }}>£25</span>
-              <span style={{ color: '#FBD9D5', fontWeight: 700 }}>/ page</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 11, marginBottom: 26 }}>
-              {data.certFeatures.map((f) => (
-                <div
-                  key={f}
-                  style={{ display: 'flex', gap: 9, fontSize: 15, fontWeight: 600, color: '#FFF1F0' }}
-                >
-                  <span style={{ fontWeight: 900 }}>✓</span>
-                  {f}
+            {c.kicker}
+          </p>
+          <p style={{ fontSize: 17, fontWeight: 700, color: '#D7E0EC', margin: 0, lineHeight: 1.55 }}>
+            {c.lead}
+          </p>
+        </div>
+
+        {narrow ? (
+          /* ---------- Mobile: one card per feature ---------- */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {c.rows.map((r) => (
+              <div
+                key={r.feature}
+                style={{
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 18,
+                  padding: 20,
+                  background: 'rgba(255,255,255,0.04)',
+                }}
+              >
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#EAF0F8', marginBottom: 14 }}>
+                  {r.feature}
                 </div>
-              ))}
-            </div>
-            <a
-              href={QUOTE_URL}
-              className="btn-light"
+                {/* Head-to-head: our column tinted red, theirs plain. Labels sit
+                    above the badges so nothing wraps awkwardly on a phone. */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 10,
+                    marginBottom: 14,
+                  }}
+                >
+                  <div
+                    style={{
+                      background: 'rgba(232,56,43,0.12)',
+                      border: '1px solid rgba(232,56,43,0.45)',
+                      borderRadius: 13,
+                      padding: '11px 12px 12px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        fontWeight: 900,
+                        letterSpacing: '0.7px',
+                        textTransform: 'uppercase',
+                        color: '#FF8074',
+                        marginBottom: 9,
+                      }}
+                    >
+                      {c.cols.us}
+                    </div>
+                    <CmpBadge kind="good" compact>
+                      {r.us}
+                    </CmpBadge>
+                  </div>
+                  <div
+                    style={{
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: 13,
+                      padding: '11px 12px 12px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        fontWeight: 900,
+                        letterSpacing: '0.7px',
+                        textTransform: 'uppercase',
+                        color: '#7E8FA8',
+                        marginBottom: 9,
+                      }}
+                    >
+                      {c.cols.them}
+                    </div>
+                    <CmpBadge kind={r.tone} compact>
+                      {r.them}
+                    </CmpBadge>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: '#A9B6C9',
+                    lineHeight: 1.5,
+                    borderTop: '1px solid rgba(255,255,255,0.09)',
+                    paddingTop: 12,
+                  }}
+                >
+                  {r.why}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* ---------- Desktop: comparison grid with a floating "us" column ---------- */
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: CMP_COLS,
+              gridTemplateRows: `auto repeat(${c.rows.length}, auto)`,
+              position: 'relative',
+              marginTop: 46,
+              rowGap: 0,
+            }}
+          >
+            {/* The highlighted column, floating above the table */}
+            <div
               style={{
-                display: 'block',
-                textAlign: 'center',
-                textDecoration: 'none',
-                width: '100%',
-                color: '#E8382B',
-                fontWeight: 800,
-                fontSize: 16,
-                padding: 15,
-                border: 'none',
-                borderRadius: 12,
-                cursor: 'pointer',
+                gridColumn: 2,
+                gridRow: `1 / ${c.rows.length + 2}`,
+                background: 'rgba(232,56,43,0.10)',
+                border: `2px solid ${RED}`,
+                borderRadius: 22,
+                boxShadow: '0 30px 64px rgba(232,56,43,0.28)',
+                marginTop: -34,
+                marginBottom: -14,
+                zIndex: 0,
+              }}
+            />
+
+            {/* Header row */}
+            <div style={{ ...cell, ...hdr, gridColumn: 1, gridRow: 1 }}>{c.cols.feature}</div>
+            <div
+              style={{
+                gridColumn: 2,
+                gridRow: 1,
+                zIndex: 1,
+                position: 'relative',
+                padding: '0 20px 18px',
+                textAlign: 'left',
               }}
             >
-              Get Certified Quote
-            </a>
+              {/* BADGE — sits on top of the floating column */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: `linear-gradient(135deg,#F04A3D 0%,#C22A20 100%)`,
+                  color: '#fff',
+                  borderRadius: 999,
+                  padding: '10px 22px',
+                  fontSize: 12.5,
+                  fontWeight: 900,
+                  letterSpacing: '1.4px',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 12px 26px rgba(232,56,43,0.42)',
+                  marginTop: -20,
+                  marginBottom: 12,
+                }}
+              >
+                <span style={{ fontSize: 15 }}>⭐</span> Recommended
+              </div>
+              <div
+                style={{ fontSize: 16, fontWeight: 900, color: '#FF8074', letterSpacing: '-0.2px' }}
+              >
+                {c.cols.us}
+              </div>
+            </div>
+            <div style={{ ...cell, ...hdr, gridColumn: 3, gridRow: 1 }}>{c.cols.them}</div>
+            <div style={{ ...cell, ...hdr, gridColumn: 4, gridRow: 1 }}>{c.cols.why}</div>
+
+            {/* Body rows */}
+            {c.rows.map((r, i) => {
+              const row = i + 2
+              const line = i === 0 ? 'none' : '1px solid rgba(255,255,255,0.08)'
+              return (
+                <Fragment key={r.feature}>
+                  <div
+                    style={{
+                      ...cell,
+                      gridColumn: 1,
+                      gridRow: row,
+                      borderTop: line,
+                      fontSize: 15,
+                      fontWeight: 800,
+                      color: '#EAF0F8',
+                    }}
+                  >
+                    {r.feature}
+                  </div>
+                  <div
+                    style={{
+                      ...cell,
+                      gridColumn: 2,
+                      gridRow: row,
+                      zIndex: 1,
+                      position: 'relative',
+                      borderTop: i === 0 ? 'none' : '1px solid rgba(232,56,43,0.22)',
+                    }}
+                  >
+                    <CmpBadge kind="good">{r.us}</CmpBadge>
+                  </div>
+                  <div style={{ ...cell, gridColumn: 3, gridRow: row, borderTop: line }}>
+                    <CmpBadge kind={r.tone}>{r.them}</CmpBadge>
+                  </div>
+                  <div
+                    style={{
+                      ...cell,
+                      gridColumn: 4,
+                      gridRow: row,
+                      borderTop: line,
+                      fontSize: 14.5,
+                      fontWeight: 600,
+                      color: '#A9B6C9',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {r.why}
+                  </div>
+                </Fragment>
+              )
+            })}
           </div>
+        )}
+
+        <div style={{ textAlign: 'center', marginTop: 44 }}>
+          <CTA>{c.cta}</CTA>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#8FA0B8', margin: '16px 0 0' }}>
+            ⚡ {c.footnote}
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  8g. Language reach — regions with language pills                   */
+/* ------------------------------------------------------------------ */
+
+function RegionIcon({ name, size = 22 }) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  if (name === 'compass')
+    return (
+      <svg {...p}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2 5.2-2z" />
+      </svg>
+    )
+  return (
+    <svg {...p}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3.2 12h17.6M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+    </svg>
+  )
+}
+
+function LanguageReach() {
+  const l = data.languageReach
+  const narrow = useNarrow(880)
+
+  return (
+    <section
+      style={{
+        padding: '84px 0',
+        background: 'linear-gradient(180deg,#FDF4F2 0%,#FBF3F1 100%)',
+      }}
+    >
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto 44px' }}>
+          <h2 style={{ ...heading, marginBottom: 14 }}>{l.title}</h2>
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#55504E', margin: 0, lineHeight: 1.6 }}>
+            {l.sub}
+          </p>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: narrow ? '1fr' : '1fr 1fr',
+            gap: 24,
+            marginBottom: 44,
+          }}
+        >
+          {l.regions.map((r) => (
+            <div
+              key={r.name}
+              className="card-pad"
+              style={{
+                position: 'relative',
+                overflow: 'hidden',
+                background: '#fff',
+                borderRadius: 22,
+                padding: 26,
+                boxShadow: '0 14px 34px rgba(58,54,52,0.06)',
+              }}
+            >
+              {/* Soft decorative disc, top-right */}
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  top: -46,
+                  right: -46,
+                  width: 150,
+                  height: 150,
+                  borderRadius: '50%',
+                  background: 'rgba(232,56,43,0.055)',
+                }}
+              />
+
+              <div
+                style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  marginBottom: 20,
+                }}
+              >
+                <span
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 15,
+                    flexShrink: 0,
+                    background: '#FDECEA',
+                    color: RED,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <RegionIcon name={r.icon} />
+                </span>
+                <div>
+                  <h3
+                    style={{
+                      fontSize: narrow ? 21 : 24,
+                      fontWeight: 800,
+                      color: '#1C1C1C',
+                      margin: '0 0 4px',
+                      letterSpacing: '-0.5px',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {r.name}
+                  </h3>
+                  <div style={{ fontSize: 13.5, fontWeight: 800, color: RED }}>{l.note}</div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: 'relative',
+                  background: '#FAFAFB',
+                  borderRadius: 15,
+                  padding: 16,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 10,
+                }}
+              >
+                {r.langs.map((lang) => (
+                  <span
+                    key={lang}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: '#fff',
+                      border: '1px solid #ECEEF2',
+                      borderRadius: 999,
+                      padding: '9px 15px',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#3A3634',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: '#F08A80',
+                        flexShrink: 0,
+                      }}
+                    />
+                    {lang}
+                  </span>
+                ))}
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 7,
+                    background: RED,
+                    borderRadius: 999,
+                    padding: '9px 16px',
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: '#fff',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span style={{ fontWeight: 900 }}>+</span> {l.moreLabel}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <a
+            href={QUOTE_URL}
+            className="btn-primary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 10,
+              textDecoration: 'none',
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: 16,
+              padding: '17px 34px',
+              borderRadius: 999,
+              cursor: 'pointer',
+              boxShadow: '0 12px 28px rgba(232,56,43,0.3)',
+            }}
+          >
+            {l.cta} <span aria-hidden>→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  8f. Translation samples — tabbed gallery of certified layouts      */
+/* ------------------------------------------------------------------ */
+
+const SAMPLE_TONES = {
+  green: { bg: '#E5F4EC', fg: '#177049' },
+  blue: { bg: '#E7EFFC', fg: '#2A5DB0' },
+  amber: { bg: '#FFF3D6', fg: '#8A6100' },
+  indigo: { bg: '#ECEAFB', fg: '#4A3FA8' },
+  red: { bg: '#FDEBE9', fg: '#C4382C' },
+  teal: { bg: '#E3F5F3', fg: '#1A776E' },
+}
+
+function SampleGlyph({ name }) {
+  return name === 'stamp' ? <TrustIcon name="stamp" size={16} /> : <AcceptIcon name={name} size={16} />
+}
+
+function TranslationSamples() {
+  const s = data.translationSamples
+  const [active, setActive] = useState(s.tabs[0])
+  const narrow = useNarrow(640)
+  const mid = useNarrow(1024)
+  const cols = narrow ? '1fr' : mid ? '1fr 1fr' : 'repeat(3,1fr)'
+
+  const bar = (w) => (
+    <span style={{ display: 'block', height: 8, borderRadius: 5, background: '#E9EDF3', width: w }} />
+  )
+
+  return (
+    <section style={{ padding: '84px 0', background: '#fff' }}>
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 30px' }}>
+          <h2 style={{ ...heading, marginBottom: 12 }}>{s.title}</h2>
+          <p style={{ fontSize: 15.5, fontWeight: 600, color: '#55504E', margin: 0, lineHeight: 1.6 }}>
+            {s.sub}
+          </p>
+        </div>
+
+        {/* Category pills */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 10,
+            marginBottom: 34,
+          }}
+        >
+          {s.tabs.map((t) => {
+            const on = t === active
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setActive(t)}
+                style={{
+                  border: on ? 'none' : '1px solid #EFE2DF',
+                  background: on ? RED : '#fff',
+                  color: on ? '#fff' : '#3A3634',
+                  borderRadius: 999,
+                  padding: '11px 20px',
+                  fontSize: 14,
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: on ? '0 8px 20px rgba(232,56,43,0.28)' : '0 2px 8px rgba(58,54,52,0.05)',
+                }}
+              >
+                {t}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Sample cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 22 }}>
+          {s.cards.map((c) => {
+            const tone = SAMPLE_TONES[c.tone]
+            return (
+              <div
+                key={c.title + c.pair}
+                style={{
+                  background: '#fff',
+                  border: '1px solid #F1E7E4',
+                  borderRadius: 18,
+                  overflow: 'hidden',
+                  boxShadow: '0 12px 30px rgba(58,54,52,0.06)',
+                }}
+              >
+                {/* Mock document preview */}
+                <div style={{ padding: 16, background: '#FBF8F7' }}>
+                  <div
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #EEF1F5',
+                      borderRadius: 12,
+                      padding: 16,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 10,
+                        marginBottom: 16,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 10.5,
+                          fontWeight: 800,
+                          letterSpacing: '0.7px',
+                          textTransform: 'uppercase',
+                          color: '#8A857F',
+                        }}
+                      >
+                        {c.kicker}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 900,
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
+                          background: tone.bg,
+                          color: tone.fg,
+                          borderRadius: 6,
+                          padding: '5px 9px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {c.badge}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+                      {bar('88%')}
+                      {bar('100%')}
+                      {bar('62%')}
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 10,
+                        borderTop: '1px solid #EEF1F5',
+                        paddingTop: 13,
+                      }}
+                    >
+                      <span style={{ fontSize: 13.5, fontWeight: 600, color: '#9AA3AF' }}>
+                        {c.footer}
+                      </span>
+                      <span style={{ color: RED, display: 'inline-flex', flexShrink: 0 }}>
+                        <SampleGlyph name={c.icon} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card body */}
+                <div style={{ padding: '18px 20px 22px' }}>
+                  <h3
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 800,
+                      color: '#1C1C1C',
+                      margin: '0 0 8px',
+                      letterSpacing: '-0.2px',
+                    }}
+                  >
+                    {c.title}
+                  </h3>
+                  <p style={{ fontSize: 14.5, fontWeight: 700, color: '#5B6472', margin: '0 0 18px' }}>
+                    {c.pair}
+                  </p>
+
+                  {c.url ? (
+                    <a
+                      href={c.url}
+                      target="_blank"
+                      rel="noopener"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        textDecoration: 'none',
+                        border: `1px solid ${RED}`,
+                        color: RED,
+                        borderRadius: 10,
+                        padding: '11px 14px',
+                        fontSize: 14.5,
+                        fontWeight: 800,
+                      }}
+                    >
+                      <EyeIcon /> Preview Sample
+                    </a>
+                  ) : (
+                    <span
+                      aria-disabled="true"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        border: '1px solid #EFE2DF',
+                        color: '#B9B2AF',
+                        borderRadius: 10,
+                        padding: '11px 14px',
+                        fontSize: 14.5,
+                        fontWeight: 800,
+                      }}
+                    >
+                      <EyeIcon /> Preview Sample
+                    </span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function EyeIcon() {
+  return (
+    <svg
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="3.2" />
+    </svg>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  8e. Why applicants & businesses trust us — dark reasons grid       */
+/* ------------------------------------------------------------------ */
+
+function TrustIcon({ name, size = 20 }) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.9,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  if (name === 'stamp')
+    return (
+      <svg {...p}>
+        <path d="M9 3.5h6a2.5 2.5 0 0 1 2.5 2.5c0 1.6-1.2 2.3-1.7 3.4-.3.7-.3 1.4-.3 2.1H8.5c0-.7 0-1.4-.3-2.1C7.7 8.3 6.5 7.6 6.5 6A2.5 2.5 0 0 1 9 3.5z" />
+        <rect x="4" y="13.5" width="16" height="4" rx="1.4" />
+        <path d="M4.6 20.5h14.8" />
+      </svg>
+    )
+  if (name === 'truck')
+    return (
+      <svg {...p}>
+        <path d="M2.5 6.5h11v9h-11z" />
+        <path d="M13.5 10h3.6l2.9 3v2.5h-6.5z" />
+        <circle cx="7" cy="18" r="1.9" />
+        <circle cx="17" cy="18" r="1.9" />
+      </svg>
+    )
+  if (name === 'tag')
+    return (
+      <svg {...p}>
+        <path d="M3.5 11.2V4.5a1 1 0 0 1 1-1h6.7a1 1 0 0 1 .7.3l8 8a1 1 0 0 1 0 1.4l-6.7 6.7a1 1 0 0 1-1.4 0l-8-8a1 1 0 0 1-.3-.7z" />
+        <circle cx="7.8" cy="7.8" r="1.4" />
+      </svg>
+    )
+  if (name === 'shieldLock')
+    return (
+      <svg {...p}>
+        <path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z" />
+        <rect x="9.4" y="11" width="5.2" height="4.2" rx="1" />
+        <path d="M10.5 11V9.9a1.5 1.5 0 0 1 3 0V11" />
+      </svg>
+    )
+  if (name === 'headset')
+    return (
+      <svg {...p}>
+        <path d="M4.5 14v-2a7.5 7.5 0 0 1 15 0v2" />
+        <rect x="2.8" y="13.5" width="4" height="5.4" rx="1.6" />
+        <rect x="17.2" y="13.5" width="4" height="5.4" rx="1.6" />
+        <path d="M19.2 18.9v.6a2.2 2.2 0 0 1-2.2 2.2h-2.6" />
+      </svg>
+    )
+  /* personCheck */
+  return (
+    <svg {...p}>
+      <circle cx="10" cy="8" r="3.6" />
+      <path d="M3.6 20a6.4 6.4 0 0 1 11.2-4.2" />
+      <path d="M15.4 18.4l1.9 1.9 3.4-3.6" />
+    </svg>
+  )
+}
+
+function TrustReasons() {
+  const t = data.trustReasons
+  const narrow = useNarrow(640)
+  const mid = useNarrow(1024)
+  const cols = narrow ? '1fr' : mid ? '1fr 1fr' : 'repeat(3,1fr)'
+
+  return (
+    <section
+      style={{
+        padding: '84px 0',
+        background: 'linear-gradient(180deg,#191617 0%,#131011 100%)',
+      }}
+    >
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 760, margin: '0 auto 44px' }}>
+          <h2 style={{ ...heading, color: '#fff', marginBottom: 14 }}>{t.title}</h2>
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#B3ACAA', margin: 0, lineHeight: 1.6 }}>
+            {t.sub}
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 20, marginBottom: 26 }}>
+          {t.cards.map((c) => (
+            <div
+              key={c.title}
+              style={{
+                background: 'rgba(255,255,255,0.035)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 18,
+                padding: 26,
+              }}
+            >
+              <span
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  background: 'rgba(232,56,43,0.16)',
+                  color: '#FF6A5C',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 22,
+                }}
+              >
+                <TrustIcon name={c.icon} />
+              </span>
+              <h3
+                style={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  color: '#fff',
+                  margin: '0 0 14px',
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.3px',
+                }}
+              >
+                {c.title}
+              </h3>
+              <p
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  color: '#A39C9A',
+                  margin: 0,
+                  lineHeight: 1.65,
+                }}
+              >
+                {c.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Closing bar */}
+        <div
+          className="card-pad"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 18,
+            background: 'rgba(255,255,255,0.035)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 16,
+            padding: narrow ? 22 : '24px 28px',
+          }}
+        >
+          <div style={{ flex: '1 1 320px' }}>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                color: '#fff',
+                marginBottom: 8,
+                letterSpacing: '-0.3px',
+              }}
+            >
+              {t.barTitle}
+            </div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#A39C9A' }}>
+              🔒 {t.barNote}
+            </div>
+          </div>
+          <a
+            href={QUOTE_URL}
+            className="btn-primary"
+            style={{
+              display: 'block',
+              textAlign: 'center',
+              textDecoration: 'none',
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: 15.5,
+              padding: '15px 28px',
+              borderRadius: 999,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              width: narrow ? '100%' : 'auto',
+            }}
+          >
+            {t.cta}
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  8d. Acceptance — "Need your translation accepted the first time?"  */
+/* ------------------------------------------------------------------ */
+
+function AcceptIcon({ name, size = 17 }) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.9,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  if (name === 'cap')
+    return (
+      <svg {...p}>
+        <path d="M12 4l9.5 4.5L12 13 2.5 8.5 12 4z" />
+        <path d="M6.5 10.6V15c0 1.6 2.5 3 5.5 3s5.5-1.4 5.5-3v-4.4" />
+      </svg>
+    )
+  if (name === 'baby')
+    return (
+      <svg {...p}>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M9.8 8.2h.01M14.2 8.2h.01M10.3 10.4c1 .8 2.4.8 3.4 0" />
+        <path d="M5 20a7 7 0 0 1 14 0" />
+      </svg>
+    )
+  if (name === 'rings')
+    return (
+      <svg {...p}>
+        <circle cx="9" cy="14.5" r="5" />
+        <circle cx="15" cy="14.5" r="5" />
+        <path d="M12 4.5l2 2.5h-4l2-2.5z" />
+      </svg>
+    )
+  if (name === 'licence')
+    return (
+      <svg {...p}>
+        <rect x="2.5" y="5" width="19" height="14" rx="2.4" />
+        <circle cx="8.5" cy="11" r="2.1" />
+        <path d="M5.4 16.4c.7-1.5 4.5-1.5 5.2 0M14.5 10h4.5M14.5 13.5h3" />
+      </svg>
+    )
+  if (name === 'gavel')
+    return (
+      <svg {...p}>
+        <path d="M13.6 4.4l6 6M16.6 1.4l6 6M15.1 8.9l-8 8M4 20.5h8" />
+        <path d="M9.4 11.2l3.4 3.4" />
+      </svg>
+    )
+  if (name === 'briefcase')
+    return (
+      <svg {...p}>
+        <rect x="2.5" y="7.5" width="19" height="12.5" rx="2.2" />
+        <path d="M8.5 7.5V5.8a1.8 1.8 0 0 1 1.8-1.8h3.4a1.8 1.8 0 0 1 1.8 1.8v1.7M2.5 12.5h19" />
+      </svg>
+    )
+  /* passport */
+  return (
+    <svg {...p}>
+      <rect x="4.5" y="2.5" width="15" height="19" rx="2.4" />
+      <circle cx="12" cy="9.5" r="3.2" />
+      <path d="M8.8 17.2h6.4" />
+    </svg>
+  )
+}
+
+function Acceptance() {
+  const a = data.acceptance
+  const narrow = useNarrow(640)
+  const mid = useNarrow(1024)
+
+  // Reference layout: 4 cards on the first row, 3 wider ones on the second.
+  const cols = narrow ? '1fr' : mid ? '1fr 1fr' : 'repeat(12,1fr)'
+  const spanFor = (i) => (narrow || mid ? 'auto' : i < 4 ? 'span 3' : 'span 4')
+
+  return (
+    <section style={{ padding: '84px 0', background: '#fff' }}>
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 720, margin: '0 auto 40px' }}>
+          <h2 style={{ ...heading, marginBottom: 14 }}>{a.title}</h2>
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#55504E', margin: 0, lineHeight: 1.6 }}>
+            {a.sub}
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 18, marginBottom: 26 }}>
+          {a.cards.map((c, i) => (
+            <div
+              key={c.title}
+              style={{
+                gridColumn: spanFor(i),
+                display: 'flex',
+                flexDirection: 'column',
+                background: '#fff',
+                border: '1px solid #F1E1DE',
+                borderRadius: 16,
+                padding: 22,
+                boxShadow: '0 8px 22px rgba(58,54,52,0.04)',
+              }}
+            >
+              <span
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 11,
+                  background: '#FDECEA',
+                  color: RED,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 16,
+                }}
+              >
+                <AcceptIcon name={c.icon} />
+              </span>
+
+              <h3
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: '#1C1C1C',
+                  margin: '0 0 10px',
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.2px',
+                }}
+              >
+                {c.title}
+              </h3>
+
+              <p
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 800,
+                  color: RED,
+                  margin: '0 0 10px',
+                  lineHeight: 1.45,
+                }}
+              >
+                {c.badge}
+              </p>
+
+              <p
+                style={{
+                  display: 'flex',
+                  gap: 8,
+                  alignItems: 'flex-start',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  color: '#55504E',
+                  margin: 0,
+                  lineHeight: 1.55,
+                }}
+              >
+                <span style={{ color: RED, fontWeight: 900, flexShrink: 0 }}>✓</span>
+                {c.text}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Closing bar */}
+        <div
+          className="card-pad"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 18,
+            background: '#fff',
+            border: '1px solid #F1E1DE',
+            borderRadius: 16,
+            padding: narrow ? 22 : '24px 28px',
+            boxShadow: '0 10px 26px rgba(58,54,52,0.05)',
+          }}
+        >
+          <div style={{ flex: '1 1 340px' }}>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                color: '#1C1C1C',
+                marginBottom: 8,
+                letterSpacing: '-0.3px',
+              }}
+            >
+              {a.barTitle}
+            </div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#8A857F' }}>
+              <span style={{ color: RED }}>🛡</span> {a.barNote}
+            </div>
+          </div>
+          <a
+            href={QUOTE_URL}
+            className="btn-primary"
+            style={{
+              display: 'block',
+              textAlign: 'center',
+              textDecoration: 'none',
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: 15.5,
+              padding: '15px 28px',
+              borderRadius: 999,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              width: narrow ? '100%' : 'auto',
+            }}
+          >
+            {a.cta}
+          </a>
         </div>
       </div>
     </section>
@@ -2446,18 +3989,18 @@ export default function App() {
     >
       <Header />
       <Hero />
-      <TrustStrip />
       <OfficialTrust />
-      <Intro />
-      <Solutions />
-      <WhyChoose />
-      <SocialProof />
       <Pricing />
-      <Samples />
-      <TechLocalisation />
-      <Languages />
-      <ISO />
-      <Process />
+      <SpecialistBand />
+      <Comparison />
+      <Acceptance />
+      <TrustReasons />
+      <TranslationSamples />
+      <LanguageReach />
+      <SocialProof />
+      {/* Removed from the page (components kept in this file so they can be
+          restored by re-adding a single line): Solutions, WhyChoose, Samples,
+          TechLocalisation, Languages, ISO, Process. */}
       <FAQ />
       <Footer />
       <MobileBar />

@@ -2,9 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { renameSync, existsSync } from 'node:fs'
 
-// Build the independent test page for upload to /translation-agency-test-only/.
-export default defineConfig({
-  base: '/translation-agency-test-only/',
+// Build the independent test page.
+// TEST_BASE lets the same config produce a build for a different URL prefix
+// (e.g. TEST_BASE=/translation-agency/ when deploying over the live page).
+export default defineConfig(({ isSsrBuild }) => ({
+  base: process.env.TEST_BASE || '/translation-agency-test-only/',
   plugins: [
     react(),
     {
@@ -17,8 +19,7 @@ export default defineConfig({
       },
     },
   ],
-  build: {
-    outDir: 'dist-test',
-    rollupOptions: { input: 'index-test.html' },
-  },
-})
+  build: isSsrBuild
+    ? { outDir: 'dist-test-server' }
+    : { outDir: 'dist-test', rollupOptions: { input: 'index-test.html' } },
+}))

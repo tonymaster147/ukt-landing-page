@@ -27,3 +27,4 @@ scratch-*.log
 *.csv
 api/export.php
 dist-test
+dist-test-server
