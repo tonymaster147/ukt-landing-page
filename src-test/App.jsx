@@ -2447,6 +2447,303 @@ function Comparison() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  8h. Quick quote — upload panel below the FAQ                       */
+/*  Posts to the same PHP endpoint as the main form, so it fires the   */
+/*  same two emails (lead notification + customer confirmation) and    */
+/*  lands on the same thank-you page.                                  */
+/* ------------------------------------------------------------------ */
+
+const QQ_MAX_BYTES = 25 * 1024 * 1024
+
+function QuickQuote() {
+  const q = data.quickQuote
+  const inputId = useId()
+  const [files, setFiles] = useState([])
+  const [over, setOver] = useState(false)
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [cap, setCap] = useState({ a: 3, b: 4 })
+  useEffect(() => {
+    setCap({ a: randDigit(), b: randDigit() })
+  }, [])
+
+  const takeFiles = (list) => {
+    const picked = Array.from(list || []).slice(0, 10)
+    const tooBig = picked.find((f) => f.size > QQ_MAX_BYTES)
+    if (tooBig) {
+      setError(`“${tooBig.name}” is larger than 25MB. Please upload a smaller file.`)
+      return
+    }
+    setError('')
+    setFiles(picked)
+  }
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    if (submitting) return
+    const el = e.target.elements
+
+    const name = ((el['name'] && el['name'].value) || '').trim()
+    const emailNorm = ((el['email'] && el['email'].value) || '').trim().toLowerCase()
+    const phoneNorm = toE164UK((el['phone'] && el['phone'].value) || '')
+    const answer = parseInt((el['captcha'] && el['captcha'].value) || '', 10)
+
+    if (!files.length) return setError('Please attach your document first.')
+    if (!name) return setError('Please enter your name.')
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailNorm)) return setError('Please enter a valid email.')
+    if (answer !== cap.a + cap.b) {
+      setCap({ a: randDigit(), b: randDigit() })
+      if (el['captcha']) el['captcha'].value = ''
+      return setError('The captcha answer is incorrect.')
+    }
+    setError('')
+
+    const fd = new FormData()
+    fd.append('name', name)
+    fd.append('email', emailNorm)
+    fd.append('phone', (el['phone'] && el['phone'].value.trim()) || '')
+    fd.append('from', '')
+    fd.append('to', '')
+    fd.append('purpose', 'Quick upload (below FAQ)')
+    fd.append('description', '')
+    fd.append('captcha', String(answer))
+    fd.append('captcha_a', String(cap.a))
+    fd.append('captcha_b', String(cap.b))
+    files.forEach((f) => fd.append('files[]', f, f.name))
+
+    setSubmitting(true)
+    try {
+      const res = await fetch(SUBMIT_ENDPOINT, { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!json.success) {
+        setError(json.message || 'Something went wrong. Please try again.')
+        setSubmitting(false)
+        return
+      }
+
+      // Same Enhanced Conversions handling as the main form.
+      const parts = name.replace(/\s+/g, ' ').split(' ')
+      const userData = { email: emailNorm }
+      if (phoneNorm) userData.phone_number = phoneNorm
+      if (parts.length) {
+        userData.address = {
+          first_name: parts[0],
+          last_name: parts.length > 1 ? parts.slice(1).join(' ') : '',
+          country: 'GB',
+        }
+      }
+      try {
+        sessionStorage.setItem('lead_email', emailNorm)
+        sessionStorage.setItem('lead_phone', phoneNorm)
+      } catch (err) {
+        /* ignore */
+      }
+      window.dataLayer = window.dataLayer || []
+      if (typeof window.gtag !== 'function') {
+        window.gtag = function () {
+          window.dataLayer.push(arguments)
+        }
+      }
+      window.gtag('set', 'user_data', userData)
+
+      let navigated = false
+      const go = () => {
+        if (navigated) return
+        navigated = true
+        window.location.href = THANK_YOU_URL
+      }
+      window.dataLayer.push({
+        event: 'lead_submit',
+        user_data: userData,
+        eventCallback: go,
+        eventTimeout: 1500,
+      })
+      setTimeout(go, 1600)
+    } catch (err) {
+      setError('Network error — please check your connection and try again.')
+      setSubmitting(false)
+    }
+  }
+
+  const dark = {
+    width: '100%',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.14)',
+    borderRadius: 11,
+    padding: '13px 15px',
+    fontSize: 15,
+    fontWeight: 600,
+    color: '#fff',
+    outline: 'none',
+  }
+
+  return (
+    <section style={{ padding: '70px 0', background: 'linear-gradient(180deg,#211D1E 0%,#171314 100%)' }}>
+      <div
+        className="section-pad"
+        style={{ maxWidth: 640, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}
+      >
+        <h2 style={{ fontSize: 28, fontWeight: 800, color: '#fff', margin: '0 0 10px', letterSpacing: '-0.5px' }}>
+          {q.title}
+        </h2>
+        <p style={{ fontSize: 16, fontWeight: 600, color: '#C6BFBD', margin: '0 0 26px' }}>{q.sub}</p>
+
+        <form onSubmit={onSubmit}>
+          {/* Dropzone */}
+          <label
+            htmlFor={inputId}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setOver(true)
+            }}
+            onDragLeave={() => setOver(false)}
+            onDrop={(e) => {
+              e.preventDefault()
+              setOver(false)
+              takeFiles(e.dataTransfer.files)
+            }}
+            style={{
+              display: 'block',
+              border: `2px dashed ${over ? '#FF8074' : 'rgba(232,56,43,0.55)'}`,
+              background: over ? 'rgba(232,56,43,0.10)' : 'rgba(255,255,255,0.03)',
+              borderRadius: 14,
+              padding: '30px 20px',
+              cursor: 'pointer',
+              marginBottom: 20,
+            }}
+          >
+            <span
+              style={{
+                width: 46,
+                height: 46,
+                borderRadius: '50%',
+                background: RED,
+                color: '#fff',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 14,
+              }}
+            >
+              <UploadCloudIcon />
+            </span>
+            <span style={{ display: 'block', fontSize: 14.5, fontWeight: 800, color: '#fff' }}>
+              {files.length ? `${files.length} file${files.length > 1 ? 's' : ''} ready` : q.dropTitle}
+            </span>
+            <span style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#9A928F', marginTop: 5 }}>
+              {files.length ? files.map((f) => f.name).join(', ') : q.dropNote}
+            </span>
+          </label>
+          <input
+            id={inputId}
+            name="files"
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png,.docx,.doc"
+            onChange={(e) => takeFiles(e.target.files)}
+            style={{ display: 'none' }}
+          />
+
+          {/* Details appear once a document is attached — the API needs a name,
+              a valid email and the captcha, and the confirmation email needs
+              somewhere to go. */}
+          {files.length > 0 && (
+            <div style={{ display: 'grid', gap: 12, marginBottom: 20, textAlign: 'left' }}>
+              <input name="name" placeholder="Your name" style={dark} />
+              <input name="email" type="email" placeholder="Your email" style={dark} />
+              <input name="phone" placeholder="Phone (optional)" style={dark} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 14.5, fontWeight: 700, color: '#C6BFBD', whiteSpace: 'nowrap' }}>
+                  {cap.a} + {cap.b} =
+                </span>
+                <input name="captcha" inputMode="numeric" style={{ ...dark, width: 110 }} />
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#FF8074', margin: '0 0 16px' }}>{error}</p>
+          )}
+
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={submitting}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 10,
+              border: 'none',
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: 15.5,
+              padding: '15px 30px',
+              borderRadius: 999,
+              cursor: submitting ? 'wait' : 'pointer',
+              opacity: submitting ? 0.75 : 1,
+            }}
+          >
+            <UploadDocIcon />
+            {submitting ? 'Sending…' : files.length ? q.ctaSend : q.cta}
+          </button>
+        </form>
+
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: 20,
+            marginTop: 22,
+          }}
+        >
+          {q.badges.map((b) => (
+            <span
+              key={b.text}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 7,
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#C6BFBD',
+              }}
+            >
+              <span style={{ color: '#C6BFBD', display: 'inline-flex' }}>
+                {b.icon === 'headset' ? (
+                  <TrustIcon name="headset" size={15} />
+                ) : (
+                  <SpecIcon name={b.icon} size={15} />
+                )}
+              </span>
+              {b.text}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function UploadCloudIcon() {
+  return (
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6.5 18a4.5 4.5 0 0 1-.6-8.96 6 6 0 0 1 11.64-1.2A4 4 0 0 1 18 18" />
+      <path d="M12 12v7M9.2 14.3L12 11.5l2.8 2.8" />
+    </svg>
+  )
+}
+
+function UploadDocIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z" />
+      <path d="M13.5 3v5.5H19M12 17v-5M9.6 14.4L12 12l2.4 2.4" />
+    </svg>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /*  8g. Language reach — regions with language pills                   */
 /* ------------------------------------------------------------------ */
 
@@ -2678,7 +2975,6 @@ function SampleGlyph({ name }) {
 
 function TranslationSamples() {
   const s = data.translationSamples
-  const [active, setActive] = useState(s.tabs[0])
   const narrow = useNarrow(640)
   const mid = useNarrow(1024)
   const cols = narrow ? '1fr' : mid ? '1fr 1fr' : 'repeat(3,1fr)'
@@ -2690,46 +2986,11 @@ function TranslationSamples() {
   return (
     <section style={{ padding: '84px 0', background: '#fff' }}>
       <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
-        <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 30px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 38px' }}>
           <h2 style={{ ...heading, marginBottom: 12 }}>{s.title}</h2>
           <p style={{ fontSize: 15.5, fontWeight: 600, color: '#55504E', margin: 0, lineHeight: 1.6 }}>
             {s.sub}
           </p>
-        </div>
-
-        {/* Category pills */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: 10,
-            marginBottom: 34,
-          }}
-        >
-          {s.tabs.map((t) => {
-            const on = t === active
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setActive(t)}
-                style={{
-                  border: on ? 'none' : '1px solid #EFE2DF',
-                  background: on ? RED : '#fff',
-                  color: on ? '#fff' : '#3A3634',
-                  borderRadius: 999,
-                  padding: '11px 20px',
-                  fontSize: 14,
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  boxShadow: on ? '0 8px 20px rgba(232,56,43,0.28)' : '0 2px 8px rgba(58,54,52,0.05)',
-                }}
-              >
-                {t}
-              </button>
-            )
-          })}
         </div>
 
         {/* Sample cards */}
@@ -4001,6 +4262,7 @@ export default function App() {
           restored by re-adding a single line): Solutions, WhyChoose,
           SocialProof, Samples, TechLocalisation, Languages, ISO, Process. */}
       <FAQ />
+      <QuickQuote />
       <Footer />
       <MobileBar />
       <WhatsAppButton />

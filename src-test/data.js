@@ -162,6 +162,20 @@ export const brandLogos = [
   { src: 'uploads/NHS-1.webp', alt: 'NHS' },
 ]
 
+export const quickQuote = {
+  title: 'Need Your Translation Today?',
+  sub: 'Get Your Free Quote Within 10 Minutes.',
+  dropTitle: 'Click to browse or drop your document here',
+  dropNote: 'PDF, JPG, PNG, DOCX accepted (Max 25MB)',
+  cta: 'Upload My Document',
+  ctaSend: 'Send My Document',
+  badges: [
+    { icon: 'award', text: 'Strict Confidentiality' },
+    { icon: 'shield', text: '100% Guaranteed Acceptance' },
+    { icon: 'headset', text: '24/7 UK Support' },
+  ],
+}
+
 export const languageReach = {
   title: 'Translate Documents Into 200+ Languages',
   sub: 'Certified, human-translated coverage across every major region — accepted by UK government bodies and businesses worldwide.',
@@ -218,14 +232,6 @@ export const languageReach = {
 export const translationSamples = {
   title: 'Translation Samples',
   sub: 'Inspect officially certified, UK Home Office-compliant document layouts with stamped translator credentials.',
-  tabs: [
-    'Birth Certificate',
-    'Marriage Certificate',
-    'Driving Licence',
-    'Academic Transcript',
-    'Legal Contract',
-    'Medical Report',
-  ],
   cards: [
     {
       kicker: 'Certified Translation',
@@ -275,7 +281,7 @@ export const translationSamples = {
       icon: 'gavel',
       title: 'NAATI Certified',
       pair: 'Spanish → English',
-      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/certified-translation-from-spanish-to-english-after-and-before.pdf',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/10/Spanish-to-English.pdf',
     },
     {
       kicker: 'Medical Accuracy',
@@ -285,8 +291,7 @@ export const translationSamples = {
       icon: 'briefcase',
       title: 'ITI Translation',
       pair: 'Russian → English',
-      // No Russian → English sample PDF supplied yet — button renders inactive.
-      url: null,
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/10/Russian-to-English.pdf',
     },
   ],
 }
