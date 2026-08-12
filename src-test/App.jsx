@@ -802,7 +802,7 @@ function Hero() {
             }}
           >
             Certified UK Document Translations with{' '}
-            <span style={{ color: '#E8382B' }}>100% Acceptance Rate</span>
+            <span style={{ color: '#E8382B' }}>97.58% Acceptance Rate</span>
           </h1>
           <p
             style={{
@@ -813,8 +813,8 @@ function Hero() {
               margin: '0 0 22px',
             }}
           >
-            Fast, official document translations accepted by the UK Home Office, courts,
-            universities, and UKVI. Fast, accurate, and translated by human experts.
+            Official document translations accepted by the UK Home Office, courts, universities
+            and UKVI — accurate, fast and translated by human experts.
           </p>
           <ul
             style={{
@@ -1894,7 +1894,19 @@ function Pricing() {
     >
       <div className="section-pad" style={{ maxWidth: 1020, margin: '0 auto', padding: '0 32px' }}>
         <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 52px' }}>
-          <h2 style={{ ...heading, marginBottom: 18 }}>{data.pricingIntro.title}</h2>
+          <h2 style={{ ...heading, marginBottom: 14 }}>{data.pricingIntro.title}</h2>
+          <p
+            style={{
+              fontSize: 16.5,
+              fontWeight: 600,
+              color: '#55504E',
+              margin: '0 auto 20px',
+              lineHeight: 1.6,
+              maxWidth: 660,
+            }}
+          >
+            {data.pricingIntro.sub}
+          </p>
 
           {/* Assurance strip — compact icon + label row under the heading. */}
           <div
@@ -1946,6 +1958,18 @@ function Pricing() {
             <PlanCard key={p.id} plan={p} />
           ))}
         </div>
+
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: 13.5,
+            fontWeight: 700,
+            color: '#8A857F',
+            margin: '26px 0 0',
+          }}
+        >
+          {data.pricingIntro.vatNote}
+        </p>
 
       </div>
     </section>

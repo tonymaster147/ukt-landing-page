@@ -178,7 +178,7 @@ export const quickQuote = {
 
 export const languageReach = {
   title: 'Translate Documents Into 200+ Languages',
-  sub: 'Certified, human-translated coverage across every major region — accepted by UK government bodies and businesses worldwide.',
+  sub: 'Certified, human-translated coverage across every major region — accepted by UK government bodies. Also used by businesses internationally',
   note: 'Official UKVI Accepted',
   moreLabel: 'and more',
   regions: [
@@ -196,7 +196,9 @@ export const languageReach = {
         'Dutch',
         'Greek',
         'Ukrainian',
-        'Serbo-Croatian',
+        'Serbian',
+        'Croatian',
+        'Bosnian',
       ],
     },
     {
@@ -298,7 +300,7 @@ export const translationSamples = {
 
 export const trustReasons = {
   title: 'Why Applicants & Businesses Trust Us',
-  sub: 'We don’t just translate words—we eliminate application risks, speed up approvals, and guarantee acceptance across all official UK authorities.',
+  sub: 'We don’t just translate words — we eliminate application risks, speed up approvals, and maximise acceptance across all official UK authorities.',
   cards: [
     {
       icon: 'personCheck',
@@ -308,7 +310,7 @@ export const trustReasons = {
     {
       icon: 'stamp',
       title: '100% Official UK Certification',
-      text: 'Every document comes complete with an official certification statement, translator credentials, company seal, and direct contact details. Fully recognized by the UK Home Office, UKVI, HM Courts, universities, and government bodies—guaranteed to be accepted on the first submission.',
+      text: 'Fully recognised by the UK Home Office, UKVI, HM Courts, universities, and government bodies, every document comes complete with an official certification statement, translator credentials, company seal, and direct contact details.',
     },
     {
       icon: 'truck',
@@ -322,8 +324,8 @@ export const trustReasons = {
     },
     {
       icon: 'shieldLock',
-      title: 'ISO-Accredited Quality & Security',
-      text: 'Your sensitive legal, financial, and personal data is protected under strict bank-grade confidentiality and data protection standards. Our ISO-compliant procedures guarantee rigorous multi-stage quality checks before any file reaches your hands.',
+      title: 'ISO-Certified Quality & Security',
+      text: 'Your sensitive legal, financial, and personal data is protected under strict bank-grade confidentiality and data protection standards. Our ISO-certified procedures guarantee rigorous multi-stage quality checks before any file reaches your hands.',
     },
     {
       icon: 'headset',
@@ -338,48 +340,48 @@ export const trustReasons = {
 
 export const acceptance = {
   title: 'Need Your Translation Accepted the First Time?',
-  sub: 'A single formatting error or uncertified stamp can delay your application for weeks. We guarantee 100% acceptance across all UK authorities so you submit with total confidence.',
+  sub: 'A single formatting error or uncertified stamp can delay your application for weeks. We have a 97.58% acceptance rate across all UK authorities so you can submit with total confidence.',
   cards: [
     {
       icon: 'passport',
       title: 'Visa & Immigration Documents',
-      badge: '100% acceptance guarantee by UKVI, Home Office, & Border Force.',
-      text: 'Includes signed translator credentials and official certification stamps required for immediate processing.',
+      badge: 'Widely accepted by the UKVI and the Home Office.',
+      text: 'Includes signed translator credentials and the official certification stamp required by UK authorities.',
     },
     {
       icon: 'cap',
       title: 'University & UCAS Transcripts',
-      badge: 'Accepted by UCAS, UK ENIC, & All UK Universities.',
+      badge: 'Accepted by UCAS, the UK ENIC and All UK Universities.',
       text: 'Perfectly structured degree certificates, transcripts, and diplomas formatted to meet strict academic admissions standards.',
     },
     {
       icon: 'baby',
       title: 'Birth Certificate Translation',
-      badge: 'Accepted by Passport Office, General Register Office, & Local Councils.',
+      badge: 'Accepted by the Passport Office, the General Register Office and Local Councils.',
       text: 'Flawless, word-for-word certified translations for passport applications, registry offices, and legal identity verification.',
     },
     {
       icon: 'rings',
       title: 'Marriage & Divorce Certificates',
-      badge: 'Recognized by UK Courts, Registrars, & Government Bodies.',
-      text: 'Officially certified for legal name changes, spousal visas, and official marital status updates across the UK.',
+      badge: 'Recognised by the UK Courts, the Registrars and the Government Bodies.',
+      text: 'Officially certified for legal name changes, spouse visa applications, and official marital status updates across the UK.',
     },
     {
       icon: 'licence',
       title: 'Driving Licence Translation',
-      badge: 'Accepted by the DVLA & UK Insurance Providers.',
-      text: "Accurate, official translations of overseas driver's licences for seamless DVLA exchanges and legal UK driving compliance.",
+      badge: 'Accepted by the DVLA and UK Insurance Providers.',
+      text: 'Accurate, official translations of overseas driving licences for seamless DVLA exchanges and legal UK driving compliance.',
     },
     {
       icon: 'gavel',
       title: 'Legal & Court Documentation',
-      badge: 'Court-Recognised & Fully Validated.',
+      badge: 'Court-Recognised and Fully Validated.',
       text: 'Fully compliant translations for solicitor submissions, court proceedings, probate, and binding legal agreements.',
     },
     {
       icon: 'briefcase',
       title: 'Business & Commercial Documentation',
-      badge: 'Ready for Banking, Companies House, & Commercial Deals.',
+      badge: 'Ready for Banking, Companies House and Commercial Deals.',
       text: 'High-precision translation of articles of association, financial statements, and business contracts by industry specialists.',
     },
   ],
@@ -402,11 +404,11 @@ export const comparison = {
   footnote: 'Fast 24-Hour Delivery • 100% Home Office Compliant',
   rows: [
     {
-      feature: '100% Home Office Acceptance',
-      us: 'Guaranteed',
+      feature: 'Home Office Acceptance',
+      us: '97.58% Acceptance Rate',
       them: 'Sometimes',
       tone: 'warn',
-      why: 'Prevents visa, court, or legal submission rejections.',
+      why: 'Prevents rejections caused by translation formatting or certification errors.',
     },
     {
       feature: 'Certified Human Translators',
@@ -453,7 +455,6 @@ export const specialistBand = {
   cta: 'Upload Document',
   badges: [
     { icon: 'cert', label: 'ISO 17100' },
-    { icon: 'cert', label: 'ISO 18587' },
     { icon: 'shield', label: 'GDPR Compliance' },
     { icon: 'human', label: 'Human Translation Only' },
     { icon: 'award', label: 'Certified Linguists' },
@@ -463,7 +464,9 @@ export const specialistBand = {
 
 export const pricingIntro = {
   title: 'Certified Document Translations from £25 — No Hidden Fees',
-  // Compact assurance strip under the heading (replaces the old paragraph).
+  sub: 'Choose official, 97.58% government-accepted translations for legal and visa use, or flexible professional translation for commercial content.',
+  vatNote: '*All prices include VAT',
+  // Compact assurance strip under the heading.
   assurances: [
     { icon: 'shield', text: 'Guaranteed Quality' },
     { icon: 'star', text: '98% Customer Satisfaction' },
@@ -476,7 +479,7 @@ export const pricingPlans = [
     id: 'professional',
     name: 'Professional Translation',
     price: '£15',
-    unit: 'per page',
+    unit: 'per page*',
     blurb: 'Ideal for commercial, web, and marketing content.',
     perfectFor: [
       'Business Documents',
@@ -498,7 +501,7 @@ export const pricingPlans = [
     id: 'certified',
     name: 'Certified Translation',
     price: '£25',
-    unit: 'per document',
+    unit: 'per document*',
     badge: 'Most popular — 100% UKVI & Home Office accepted',
     blurb: 'Officially stamped and court-recognised across the UK.',
     perfectFor: [
@@ -616,7 +619,7 @@ export const faqData = [
   },
   {
     q: 'Can you translate today?',
-    a: "Yes. We offer express same-day service for urgent documents, upload your file and we'll confirm turnaround before you pay.",
+    a: "Yes. We offer express same-day service for urgent documents; upload your file, and we'll confirm turnaround before you pay.",
   },
   {
     q: 'Are my files confidential?',
@@ -628,10 +631,10 @@ export const faqData = [
   },
   {
     q: 'Can I upload scanned documents?',
-    a: "Yes. We accept scans, photos, and PDFs of your original documents, you don't need an editable file. Just make sure the text is clearly legible.",
+    a: "Yes. We accept scans, photos, and PDFs of your original documents; you don't need an editable file. Just make sure the text is clearly legible.",
   },
   {
     q: 'Do I need notarisation?',
-    a: 'Not usually, most UK government bodies, universities, and employers only require a certified translation, which is included as standard. If your specific use case requires notarisation (for example, some international or legal submissions), we also offer that as an add-on, just let us know when you order.',
+    a: 'Not usually; most UK government bodies, universities, and employers only require a certified translation, which is included as standard. If your specific use case requires notarisation (for example, some international or legal submissions), we also offer that as an add-on; just let us know when you order.',
   },
 ]
