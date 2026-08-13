@@ -1087,7 +1087,7 @@ function OfficialTrust() {
         style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}
       >
         <h2 style={{ ...heading, marginBottom: 36 }}>
-          100% Accepted by All UK Government Bodies &amp; Authorities
+          Widely Accepted by All UK Government Bodies &amp; Authorities
         </h2>
 
         {/* Institution logos */}
@@ -4103,7 +4103,7 @@ function Footer() {
           </a>
         </div>
         <div style={{ fontSize: 13, fontWeight: 600 }}>
-          © 2026 translations.co.uk · ISO 17100 &amp; 18587 Certified
+          © 2026 translations.co.uk · ISO 17100 Certified
         </div>
       </div>
       <div

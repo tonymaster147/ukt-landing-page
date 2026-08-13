@@ -178,7 +178,7 @@ export const quickQuote = {
 
 export const languageReach = {
   title: 'Translate Documents Into 200+ Languages',
-  sub: 'Certified, human-translated coverage across every major region — accepted by UK government bodies. Also used by businesses internationally',
+  sub: 'Certified, human-translated coverage across every major region — accepted by UK government bodies. Also used by businesses internationally.',
   note: 'Official UKVI Accepted',
   moreLabel: 'and more',
   regions: [
@@ -276,7 +276,7 @@ export const translationSamples = {
       url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/english-to-polish-standard-translation-after-and-before.pdf',
     },
     {
-      kicker: 'Court Recognized',
+      kicker: 'Court Recognised',
       badge: 'Solicitor Verified',
       tone: 'red',
       footer: 'Binding Legal Accuracy',
@@ -351,19 +351,19 @@ export const acceptance = {
     {
       icon: 'cap',
       title: 'University & UCAS Transcripts',
-      badge: 'Accepted by UCAS, the UK ENIC and All UK Universities.',
+      badge: 'Accepted by UCAS, UK ENIC and UK universities',
       text: 'Perfectly structured degree certificates, transcripts, and diplomas formatted to meet strict academic admissions standards.',
     },
     {
       icon: 'baby',
       title: 'Birth Certificate Translation',
-      badge: 'Accepted by the Passport Office, the General Register Office and Local Councils.',
+      badge: 'Accepted by the HM Passport Office, the General Register Office and Local Councils.',
       text: 'Flawless, word-for-word certified translations for passport applications, registry offices, and legal identity verification.',
     },
     {
       icon: 'rings',
       title: 'Marriage & Divorce Certificates',
-      badge: 'Recognised by the UK Courts, the Registrars and the Government Bodies.',
+      badge: 'Recognised by UK Courts, Registrars and Government Bodies.',
       text: 'Officially certified for legal name changes, spouse visa applications, and official marital status updates across the UK.',
     },
     {
@@ -386,7 +386,7 @@ export const acceptance = {
     },
   ],
   barTitle: 'Translate My Document Now',
-  barNote: '100% Acceptance Guarantee  •  Delivered in 24 Hours  •  Starting at £25',
+  barNote: '97.58% Acceptance Rate  •  Delivered in 24 Hours  •  Starting at £25',
   cta: 'Get Started Right Now',
 }
 
@@ -512,7 +512,7 @@ export const pricingPlans = [
       'Driving Licences & Academic Transcripts',
     ],
     included: [
-      { text: '100% Acceptance Guarantee (Home Office, Courts & Universities)', strong: true },
+      { text: 'Acceptance Guarantee (Home Office, Courts & Universities)', strong: true },
       { text: 'Official Certification Stamp & Signed Translator Declaration' },
       { text: 'Qualified & Vetted Human Translators' },
       { text: 'Digital PDF + Physical Hard Copy (Optional)' },
