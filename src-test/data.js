@@ -512,7 +512,6 @@ export const pricingPlans = [
       'Driving Licences & Academic Transcripts',
     ],
     included: [
-      { text: 'Acceptance Guarantee (Home Office, Courts & Universities)', strong: true },
       { text: 'Official Certification Stamp & Signed Translator Declaration' },
       { text: 'Qualified & Vetted Human Translators' },
       { text: 'Digital PDF + Physical Hard Copy (Optional)' },
