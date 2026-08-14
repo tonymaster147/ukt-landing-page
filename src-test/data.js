@@ -171,7 +171,7 @@ export const quickQuote = {
   ctaSend: 'Send My Document',
   badges: [
     { icon: 'award', text: 'Strict Confidentiality' },
-    { icon: 'shield', text: '100% Guaranteed Acceptance' },
+    { icon: 'shield', text: '97.58% Acceptance Rate' },
     { icon: 'headset', text: '24/7 UK Support' },
   ],
 }
@@ -309,7 +309,7 @@ export const trustReasons = {
     },
     {
       icon: 'stamp',
-      title: '100% Official UK Certification',
+      title: 'Official UK Certification',
       text: 'Fully recognised by the UK Home Office, UKVI, HM Courts, universities, and government bodies, every document comes complete with an official certification statement, translator credentials, company seal, and direct contact details.',
     },
     {
@@ -333,9 +333,9 @@ export const trustReasons = {
       text: 'Get real-time updates and quick answers whenever you need them. Our responsive UK-based support team is available around the clock via live chat and email to assist with urgent updates, custom requests, and order tracking.',
     },
   ],
-  barTitle: 'Get Your Fast Quote Now',
-  barNote: 'Secure Payment Options  •  No Hidden Fees',
-  cta: 'Request Fast Quote',
+  barTitle: 'Have an emergency? We are available. ',
+  barNote: 'Secure Payment Options • No Hidden Fees',
+  cta: 'Get Your Fast Quote Now',
 }
 
 export const acceptance = {
@@ -351,13 +351,13 @@ export const acceptance = {
     {
       icon: 'cap',
       title: 'University & UCAS Transcripts',
-      badge: 'Accepted by UCAS, UK ENIC and UK universities',
+      badge: 'Accepted by UCAS, UK ENIC and UK universities.',
       text: 'Perfectly structured degree certificates, transcripts, and diplomas formatted to meet strict academic admissions standards.',
     },
     {
       icon: 'baby',
       title: 'Birth Certificate Translation',
-      badge: 'Accepted by the HM Passport Office, the General Register Office and Local Councils.',
+      badge: 'Accepted by HM Passport Office, the General Register Office and local councils.',
       text: 'Flawless, word-for-word certified translations for passport applications, registry offices, and legal identity verification.',
     },
     {
@@ -369,7 +369,7 @@ export const acceptance = {
     {
       icon: 'licence',
       title: 'Driving Licence Translation',
-      badge: 'Accepted by the DVLA and UK Insurance Providers.',
+      badge: 'Accepted by the DVLA and UK insurance providers.',
       text: 'Accurate, official translations of overseas driving licences for seamless DVLA exchanges and legal UK driving compliance.',
     },
     {
@@ -401,7 +401,6 @@ export const comparison = {
     why: 'Why it matters to you',
   },
   cta: 'Get Your Guaranteed Quote Now',
-  footnote: 'Fast 24-Hour Delivery • 100% Home Office Compliant',
   rows: [
     {
       feature: 'Home Office Acceptance',
@@ -492,7 +491,7 @@ export const pricingPlans = [
       { text: 'Translated by Industry-Expert Human Translators' },
       { text: 'Rigorous Quality Assurance & Editing' },
       { text: 'Digital Delivery (PDF / Word)' },
-      { text: 'Turnaround: 24–48 Hours', icon: 'bolt' },
+      { text: 'Turnaround: Varies', icon: 'bolt' },
     ],
     cta: 'Get Business Quote',
     featured: false,
@@ -502,7 +501,7 @@ export const pricingPlans = [
     name: 'Certified Translation',
     price: '£25',
     unit: 'per document*',
-    badge: 'Most popular — 100% UKVI & Home Office accepted',
+    badge: 'Most popular',
     blurb: 'Officially stamped and court-recognised across the UK.',
     perfectFor: [
       'Visas & Immigration (UKVI / Home Office)',

@@ -830,7 +830,7 @@ function Hero() {
               'UK Government Accepted',
               'Same-Day & 24-Hour Delivery',
               'Human Certified Translators',
-              'Starting from £25 (No Hidden Fees)',
+              'Starting from £15 (No Hidden Fees)',
             ].map((item) => (
               <li key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span
@@ -1087,7 +1087,7 @@ function OfficialTrust() {
         style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}
       >
         <h2 style={{ ...heading, marginBottom: 36 }}>
-          Widely Accepted by All UK Government Bodies &amp; Authorities
+          Widely Accepted by UK Government Bodies &amp; Authorities
         </h2>
 
         {/* Institution logos */}
@@ -1122,10 +1122,10 @@ function OfficialTrust() {
         </p>
 
         <div>
-          <CTA>Get Your Guaranteed Quote</CTA>
+          <CTA>Get Your Fixed-Price Quote</CTA>
         </div>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#8A857F', margin: '14px 0 0' }}>
-          🔒 100% Home Office Compliant • Delivered in 24 Hours
+          Home Office Compliant
         </p>
       </div>
     </section>
@@ -2461,9 +2461,6 @@ function Comparison() {
 
         <div style={{ textAlign: 'center', marginTop: 44 }}>
           <CTA>{c.cta}</CTA>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#8FA0B8', margin: '16px 0 0' }}>
-            ⚡ {c.footnote}
-          </p>
         </div>
       </div>
     </section>
