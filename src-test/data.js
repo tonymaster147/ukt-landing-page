@@ -171,7 +171,6 @@ export const quickQuote = {
   ctaSend: 'Send My Document',
   badges: [
     { icon: 'award', text: 'Strict Confidentiality' },
-    { icon: 'shield', text: '97.58% Acceptance Rate' },
     { icon: 'headset', text: '24/7 UK Support' },
   ],
 }
@@ -340,7 +339,7 @@ export const trustReasons = {
 
 export const acceptance = {
   title: 'Need Your Translation Accepted the First Time?',
-  sub: 'A single formatting error or uncertified stamp can delay your application for weeks. We have a 97.58% acceptance rate across all UK authorities so you can submit with total confidence.',
+  sub: 'A single formatting error or uncertified stamp can delay your application for weeks. We have certified translators, so you can submit with total confidence.',
   cards: [
     {
       icon: 'passport',
@@ -386,7 +385,7 @@ export const acceptance = {
     },
   ],
   barTitle: 'Translate My Document Now',
-  barNote: '97.58% Acceptance Rate  •  Delivered in 24 Hours  •  Starting at £25',
+  barNote: 'Delivered in 24 Hours  •  Starting at £25',
   cta: 'Get Started Right Now',
 }
 
@@ -463,7 +462,7 @@ export const specialistBand = {
 
 export const pricingIntro = {
   title: 'Certified Document Translations from £25 — No Hidden Fees',
-  sub: 'Choose official, 97.58% government-accepted translations for legal and visa use, or flexible professional translation for commercial content.',
+  sub: 'Choose official government-accepted translations for legal and visa use, or flexible professional translation for commercial content.',
   vatNote: '*All prices include VAT',
   // Compact assurance strip under the heading.
   assurances: [
@@ -605,7 +604,7 @@ export const processSteps = [
 export const faqData = [
   {
     q: 'Will UKVI accept my translation?',
-    a: "We maintain a 97.58% acceptance rate with UKVI, the Home Office, and other UK government bodies. Every translation includes a signed certificate of accuracy stating the translator's credentials and confirming it's a complete, accurate translation; the format these bodies require. While no translation provider can guarantee acceptance, since the final decision always rests with the receiving authority, in the rare case a translation is rejected on formatting or certification grounds, we'll revise it free of charge.",
+    a: "We have a high acceptance rate with UKVI, the Home Office, and other UK government bodies. Every translation includes a signed certificate of accuracy stating the translator's credentials and confirming it's a complete, accurate translation in the format these bodies require. While no translation provider can guarantee acceptance, since the final decision always rests with the receiving authority, in the rare case a translation is rejected on formatting or certification grounds, we'll revise it free of charge.",
   },
   {
     q: 'How long does translation take?',
