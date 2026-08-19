@@ -817,6 +817,7 @@ function Hero() {
             and UKVI — accurate, fast and translated by human experts.
           </p>
           <ul
+            className="hero-bullets"
             style={{
               listStyle: 'none',
               margin: '0 0 20px',
@@ -1081,7 +1082,7 @@ function LogoTile({ logo }) {
 
 function OfficialTrust() {
   return (
-    <section style={{ padding: '70px 0 34px', background: '#fff' }}>
+    <section className="trust-sec" style={{ padding: '70px 0 34px', background: '#fff' }}>
       <div
         className="section-pad"
         style={{ maxWidth: 1100, margin: '0 auto', padding: '0 32px', textAlign: 'center' }}
@@ -1890,6 +1891,7 @@ function Pricing() {
 
   return (
     <section
+      className="pricing-sec"
       style={{ padding: '38px 0 84px', background: 'linear-gradient(180deg,#fff 0%,#FBF3F1 100%)' }}
     >
       <div className="section-pad" style={{ maxWidth: 1020, margin: '0 auto', padding: '0 32px' }}>
@@ -2169,20 +2171,24 @@ function CmpBadge({ kind, children, compact }) {
       style={{
         display: 'inline-flex',
         alignItems: compact ? 'flex-start' : 'center',
-        gap: compact ? 7 : 8,
+        gap: compact ? 6 : 8,
         background: t.bg,
         color: t.fg,
         borderRadius: compact ? 11 : 999,
-        padding: compact ? '7px 10px' : '7px 13px',
-        fontSize: compact ? 13 : 14,
+        padding: compact ? '7px 9px' : '7px 13px',
+        fontSize: compact ? 12.5 : 14,
         fontWeight: 800,
         lineHeight: 1.3,
+        /* Compact badges live in a narrow phone column: fill it, allow the
+           text to wrap, and never let a long word ("Guaranteed") widen the
+           grid track past the viewport. */
+        ...(compact ? { display: 'flex', minWidth: 0, overflowWrap: 'anywhere' } : null),
       }}
     >
       <span
         style={{
-          width: 17,
-          height: 17,
+          width: compact ? 15 : 17,
+          height: compact ? 15 : 17,
           borderRadius: '50%',
           background: t.fg,
           color: '#0C1523',
@@ -2254,7 +2260,7 @@ function Comparison() {
                 style={{
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 18,
-                  padding: 20,
+                  padding: 16,
                   background: 'rgba(255,255,255,0.04)',
                 }}
               >
@@ -2266,7 +2272,7 @@ function Comparison() {
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
                     gap: 10,
                     marginBottom: 14,
                   }}
@@ -2276,7 +2282,8 @@ function Comparison() {
                       background: 'rgba(232,56,43,0.12)',
                       border: '1px solid rgba(232,56,43,0.45)',
                       borderRadius: 13,
-                      padding: '11px 12px 12px',
+                      padding: '11px 11px 12px',
+                      minWidth: 0,
                     }}
                   >
                     <div
@@ -2300,7 +2307,8 @@ function Comparison() {
                       background: 'rgba(255,255,255,0.04)',
                       border: '1px solid rgba(255,255,255,0.1)',
                       borderRadius: 13,
-                      padding: '11px 12px 12px',
+                      padding: '11px 11px 12px',
+                      minWidth: 0,
                     }}
                   >
                     <div
@@ -4077,12 +4085,13 @@ function Footer() {
       >
         <a
           href="https://www.translations.co.uk/"
-          style={{ background: '#fff', borderRadius: 12, padding: '10px 16px', display: 'inline-flex' }}
+          style={{ background: '#fff', borderRadius: 14, padding: '14px 22px', display: 'inline-flex' }}
         >
           <Img
             src="uploads/logo.webp"
             alt="translations.co.uk"
-            style={{ height: 32, width: 'auto', display: 'block' }}
+            className="footer-logo"
+            style={{ height: 46, width: 'auto', display: 'block' }}
           />
         </a>
         <div style={{ display: 'flex', gap: 24, fontSize: 14, fontWeight: 700, flexWrap: 'wrap' }}>

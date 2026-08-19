@@ -313,6 +313,22 @@ button {
   .brand-grid {
     grid-template-columns: repeat(3, 1fr) !important;
   }
+  /* The hero already states these points in the H1 and the pricing cards;
+     on a phone they only push the CTA below the fold. */
+  .hero-bullets {
+    display: none !important;
+  }
+  /* Trust logos -> pricing: the generic 48px top/bottom rule leaves ~96px of
+     dead space between two sections that read as one block. Close it up. */
+  .page > section.trust-sec:not(.strip-sec):not(.hero-sec) {
+    padding-bottom: 20px !important;
+  }
+  .page > section.pricing-sec:not(.strip-sec):not(.hero-sec) {
+    padding-top: 22px !important;
+  }
+  .footer-logo {
+    height: 52px !important;
+  }
 }
 
 /* ---- Small phone ---- */
