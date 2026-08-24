@@ -24,6 +24,12 @@ export const SUBMIT_ENDPOINT =
 // Where the visitor is sent after a successful submission.
 export const THANK_YOU_URL = 'https://www.translations.co.uk/thank-you-two/'
 
+/* Registered details shown in the footer. */
+export const footerInfo = {
+  address: '128 City Road, London, United Kingdom, EC1V 2NX',
+  companyNumber: 'Company Number – 16373383',
+}
+
 export const trustStrip = [
   { k: '98%', v: 'Satisfaction rate', icon: 'uploads/icons/0501.png' },
   { k: '100%', v: 'UK Certified Translator', icon: 'uploads/icons/0402.png' },
@@ -255,40 +261,40 @@ export const translationSamples = {
       url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/certified-translation-from-spanish-to-english-after-and-before.pdf',
     },
     {
-      kicker: 'DVLA Compliant',
-      badge: 'DVLA Validated',
+      kicker: 'Official Document',
+      badge: 'Home Office Accepted',
       tone: 'amber',
-      footer: 'Official DVLA Format',
-      icon: 'licence',
-      title: 'NAATI Certified',
-      pair: 'Pashto → English',
-      url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/pashto-to-english-standard-translation-after-and-before.pdf',
+      footer: 'Certificate of Accuracy',
+      icon: 'passport',
+      title: 'Professional Translation',
+      pair: 'Arabic → English',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/10/Arabic-to-English-2.pdf',
     },
     {
-      kicker: 'UCAS & ENIC Approved',
-      badge: 'University Standards',
+      kicker: 'Standard Translation',
+      badge: 'General & Commercial',
       tone: 'indigo',
-      footer: 'Grade Scale Alignment',
+      footer: 'Self Certification Statement',
       icon: 'cap',
       title: 'Standard Translation',
       pair: 'English → Polish',
       url: 'https://www.translations.co.uk/wp-content/uploads/2025/08/english-to-polish-standard-translation-after-and-before.pdf',
     },
     {
-      kicker: 'Court Recognised',
-      badge: 'Solicitor Verified',
+      kicker: 'Certified Translation',
+      badge: 'UKVI Accepted',
       tone: 'red',
-      footer: 'Binding Legal Accuracy',
-      icon: 'gavel',
-      title: 'NAATI Certified',
-      pair: 'Spanish → English',
-      url: 'https://www.translations.co.uk/wp-content/uploads/2025/10/Spanish-to-English.pdf',
+      footer: 'Official Seal & Credentials',
+      icon: 'briefcase',
+      title: 'Professional Translation',
+      pair: 'Portuguese → English',
+      url: 'https://www.translations.co.uk/wp-content/uploads/2025/10/Portuguese-to-English-1.pdf',
     },
     {
-      kicker: 'Medical Accuracy',
-      badge: 'NHS & Clinical',
+      kicker: 'Certified Translation',
+      badge: 'Official Use Approved',
       tone: 'teal',
-      footer: 'Clinical Terminology',
+      footer: 'Signed Certification Statement',
       icon: 'briefcase',
       title: 'ITI Translation',
       pair: 'Russian → English',
@@ -463,7 +469,6 @@ export const specialistBand = {
 export const pricingIntro = {
   title: 'Certified Document Translations from £25 — No Hidden Fees',
   sub: 'Choose official government-accepted translations for legal and visa use, or flexible professional translation for commercial content.',
-  vatNote: '*All prices include VAT',
   // Compact assurance strip under the heading.
   assurances: [
     { icon: 'shield', text: 'Guaranteed Quality' },

@@ -253,8 +253,8 @@ function Header() {
               boxShadow: '0 6px 16px rgba(232,56,43,0.25)',
             }}
           >
-            <span className="cta-full">Get My Free Quote</span>
-            <span className="cta-short">Free Quote</span>
+            <span className="cta-full">Get Your Translation</span>
+            <span className="cta-short">Get Your Translation</span>
           </a>
         </div>
       </div>
@@ -1960,18 +1960,6 @@ function Pricing() {
             <PlanCard key={p.id} plan={p} />
           ))}
         </div>
-
-        <p
-          style={{
-            textAlign: 'center',
-            fontSize: 13.5,
-            fontWeight: 700,
-            color: '#8A857F',
-            margin: '26px 0 0',
-          }}
-        >
-          {data.pricingIntro.vatNote}
-        </p>
 
       </div>
     </section>
@@ -4108,8 +4096,10 @@ function Footer() {
             <MailIcon size={15} color="#C9C4C0" /> {EMAIL}
           </a>
         </div>
-        <div style={{ fontSize: 13, fontWeight: 600 }}>
-          © 2026 translations.co.uk · ISO 17100 Certified
+        <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.7 }}>
+          <div>{data.footerInfo.address}</div>
+          <div>{data.footerInfo.companyNumber}</div>
+          <div>© 2026 translations.co.uk · ISO 17100 Certified</div>
         </div>
       </div>
       <div
@@ -4127,6 +4117,9 @@ function Footer() {
           fontWeight: 700,
         }}
       >
+        <a href="https://www.translations.co.uk/about-us/" style={{ color: '#C9C4C0' }}>
+          About Us
+        </a>
         <a href="https://www.translations.co.uk/privacy-policy/" style={{ color: '#C9C4C0' }}>
           Privacy Policy
         </a>
@@ -4216,7 +4209,7 @@ function MobileBar() {
           cursor: 'pointer',
         }}
       >
-        Get My Free Quote
+        Order Now
       </a>
     </div>
   )
