@@ -640,3 +640,75 @@ export const faqData = [
     a: 'Not usually; most UK government bodies, universities, and employers only require a certified translation, which is included as standard. If your specific use case requires notarisation (for example, some international or legal submissions), we also offer that as an add-on; just let us know when you order.',
   },
 ]
+
+/* ------------------------------------------------------------------ */
+/*  Client reviews carousel (below pricing)                            */
+/* ------------------------------------------------------------------ */
+
+/* `lead` is what shows collapsed; `rest` is revealed by "Read more".
+   The split points are the ones supplied with the design. */
+export const clientReviews = {
+  title: 'Your Satisfaction, Our Success: Client Reviews You Can Trust',
+  readMore: 'Read more',
+  readLess: 'Read less',
+  usefulLabel: 'Useful',
+  reportLabel: 'Report',
+  items: [
+    {
+      initials: 'AL',
+      name: 'Amanda Lewis, Manchester',
+      date: 'February 2, 2026',
+      lead: '“Needed certified translations for visa documents on a tight deadline,',
+      rest: 'and the team delivered much faster than expected. Everything was accepted without any issues. Communication was professional throughout.”',
+    },
+    {
+      initials: 'DF',
+      name: 'Daniel Fischer, Berlin',
+      date: 'February 4, 2026',
+      lead: '“We used Translations.co.uk for legal contract translation between',
+      rest: 'English and German. The terminology was precise, and the turnaround time was excellent. Very reliable service.”',
+    },
+    {
+      initials: 'SA',
+      name: 'Sara Ahmed, Dubai',
+      date: 'Dec 5, 2025',
+      lead: '“Their website localisation service helped us expand into the Middle',
+      rest: 'East market smoothly. The translated content felt culturally natural rather than just word-for-word translated.”',
+    },
+    {
+      initials: 'EP',
+      name: 'Elena Petrova, Spain',
+      date: 'Dec 5, 2025',
+      lead: '“I was nervous about getting my academic transcripts translated',
+      rest: 'for university admission, but the process was straightforward and stress-free. Highly recommended for certified translations.”',
+    },
+    {
+      initials: 'MH',
+      name: 'Dr Marcus Hill, French',
+      date: 'Nov 18, 2025',
+      lead: '“Professional, responsive, and genuinely helpful. We needed',
+      rest: 'urgent translation of medical documents, and they handled everything carefully with impressive accuracy.”',
+    },
+    {
+      initials: 'CM',
+      name: 'Chloe Martin, Paris',
+      date: 'Nov 18, 2025',
+      lead: '“Translations.co.uk translated our eCommerce product catalogue',
+      rest: 'into Spanish and French. The quality was far better than previous agencies we’ve worked with.”',
+    },
+    {
+      initials: 'RC',
+      name: 'Richard Coleman, Leeds',
+      date: 'Oct 13, 2025',
+      lead: '“Excellent customer support from start to finish. The team',
+      rest: 'answered all my questions quickly and delivered certified translations exactly when promised.”',
+    },
+    {
+      initials: 'NC',
+      name: 'Naomi Chen, Singapore',
+      date: 'Oct 25, 2025',
+      lead: '“We required multilingual business translations for an international',
+      rest: 'client presentation. The translations were polished, professional, and ready ahead of schedule.”',
+    },
+  ],
+}

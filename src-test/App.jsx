@@ -2027,6 +2027,160 @@ function SpecIcon({ name, size = 19 }) {
   )
 }
 
+/* ------------------------------------------------------------------ */
+/*  Client reviews — autoplaying carousel below the pricing section    */
+/* ------------------------------------------------------------------ */
+
+const ThumbIcon = ({ size = 15 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.9"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M7 10.5v9M7 10.5l3.6-7.2a2 2 0 0 1 3.8 1.1L13.6 9h4.6a2 2 0 0 1 2 2.4l-1.3 6.2a2.4 2.4 0 0 1-2.3 1.9H7" />
+    <rect x="2.5" y="10" width="4.5" height="10" rx="1.2" />
+  </svg>
+)
+
+function ClientReviews() {
+  const R = data.clientReviews
+  const [index, setIndex] = useState(0)
+  /* 3 on the server and on the first client render so hydration matches the
+     desktop-first CSS; corrected right after mount. */
+  const [per, setPer] = useState(3)
+  const [paused, setPaused] = useState(false)
+  const [open, setOpen] = useState({})
+
+  // Mirrors the CSS breakpoints below, so the dots agree with what is on screen.
+  useEffect(() => {
+    const measure = () => {
+      const w = window.innerWidth
+      setPer(w <= 767 ? 1 : w <= 1024 ? 2 : 3)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  const pages = Math.max(1, R.items.length - per + 1)
+  useEffect(() => {
+    setIndex((i) => Math.min(i, pages - 1))
+  }, [pages])
+
+  // Autoplay, paused while the pointer is over the strip.
+  useEffect(() => {
+    if (paused || pages < 2) return undefined
+    const t = setInterval(() => setIndex((i) => (i + 1) % pages), 3000)
+    return () => clearInterval(t)
+  }, [paused, pages])
+
+  const toggle = (i) => setOpen((o) => ({ ...o, [i]: !o[i] }))
+
+  return (
+    <section
+      style={{
+        padding: '76px 0 84px',
+        background: 'linear-gradient(180deg,#FBF3F1 0%,#FFFFFF 62%,#F7FBF9 100%)',
+      }}
+    >
+      <div className="section-pad" style={{ maxWidth: 1300, margin: '0 auto', padding: '0 32px' }}>
+        <h2 style={{ ...heading, textAlign: 'center', margin: '0 auto 8px', maxWidth: 900 }}>
+          {R.title}
+        </h2>
+
+        <div
+          className="rv-viewport"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          style={{ overflow: 'hidden', padding: '26px 0 8px' }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'stretch',
+              /* One card per step: the track shifts by exactly one card width,
+                 which CSS derives from --rv-per at the current breakpoint. */
+              transform: `translateX(calc(${-index} * 100% / var(--rv-per)))`,
+              transition: 'transform .55s cubic-bezier(.4,0,.2,1)',
+            }}
+          >
+            {R.items.map((r, i) => (
+              <div key={r.name} className="rv-cell" style={{ padding: '14px 12px' }}>
+                <article className="rv-card">
+                  <div className="rv-head">
+                    <span className="rv-avatar" aria-hidden="true">
+                      {r.initials}
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <p className="rv-name">{r.name}</p>
+                      <span className="rv-date">{r.date}</span>
+                    </div>
+                  </div>
+
+                  <span
+                    className="rv-stars"
+                    role="img"
+                    aria-label="Rated 5 out of 5"
+                  />
+
+                  <p className="rv-text">
+                    {r.lead}{' '}
+                    {open[i] ? (
+                      <span>{r.rest}</span>
+                    ) : (
+                      <span className="rv-dots" aria-hidden="true">
+                        …
+                      </span>
+                    )}
+                  </p>
+
+                  <button type="button" className="rv-more" onClick={() => toggle(i)}>
+                    {open[i] ? R.readLess : R.readMore}
+                  </button>
+
+                  <div className="rv-foot">
+                    <span className="rv-foot-item">
+                      <ThumbIcon />
+                      {R.usefulLabel}
+                    </span>
+                    <span className="rv-foot-item rv-report">{R.reportLabel}</span>
+                  </div>
+                </article>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {pages > 1 ? (
+          <div
+            style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 18 }}
+            role="tablist"
+            aria-label="Reviews"
+          >
+            {Array.from({ length: pages }, (_, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === index}
+                aria-label={`Go to review ${i + 1}`}
+                onClick={() => setIndex(i)}
+                className={`rv-dot${i === index ? ' is-on' : ''}`}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  )
+}
+
 function SpecialistBand() {
   const b = data.specialistBand
   const narrow = useNarrow(880)
@@ -4275,6 +4429,7 @@ export default function App() {
       <Hero />
       <OfficialTrust />
       <Pricing />
+      <ClientReviews />
       <SpecialistBand />
       <Comparison />
       <Acceptance />

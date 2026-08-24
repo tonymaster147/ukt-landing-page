@@ -190,6 +190,285 @@ button {
 }
 
 /* ================================================================== */
+/*  Client reviews carousel                                            */
+/*  --rv-per is how many cards are visible; the media queries below    */
+/*  are the single source of truth for it, and both the card width and */
+/*  the track's translate are derived from it.                         */
+/* ================================================================== */
+
+.rv-viewport {
+  --rv-per: 3;
+}
+.rv-cell {
+  flex: 0 0 calc(100% / var(--rv-per));
+  max-width: calc(100% / var(--rv-per));
+  min-width: 0;
+  display: flex;
+}
+
+.rv-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  padding: 30px 26px 24px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #fff, #fdf7f7);
+  box-shadow: 0 1px 2px rgba(196, 73, 73, 0.04), 0 10px 30px -10px rgba(196, 73, 73, 0.15),
+    0 20px 50px -20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.rv-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 4px 8px rgba(196, 73, 73, 0.06), 0 20px 50px -10px rgba(196, 73, 73, 0.25),
+    0 30px 80px -20px rgba(0, 0, 0, 0.12);
+}
+/* Red spine down the left edge. */
+.rv-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, #c44949, #e87b7b, #c44949);
+  border-radius: 22px 0 0 22px;
+}
+/* Oversized decorative quote mark. */
+.rv-card::after {
+  content: '\201C';
+  position: absolute;
+  top: -10px;
+  right: 18px;
+  font-size: 110px;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: rgba(196, 73, 73, 0.08);
+  line-height: 1;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.rv-head {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(196, 73, 73, 0.18);
+}
+.rv-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: 0.2px;
+}
+.rv-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #c44949;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.rv-date::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #c44949;
+}
+
+.rv-avatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: linear-gradient(135deg, #c44949, #e87b7b);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(196, 73, 73, 0.35), 0 0 0 2px rgba(196, 73, 73, 0.15);
+  transition: transform 0.3s ease;
+}
+.rv-card:hover .rv-avatar {
+  transform: scale(1.05) rotate(-3deg);
+}
+
+.rv-stars {
+  display: inline-block;
+  height: 20px;
+  margin-bottom: 14px;
+  white-space: nowrap;
+  line-height: 1;
+}
+.rv-stars::before {
+  content: '★★★★★';
+  font-size: 18px;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, #ffb800, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(255, 184, 0, 0.3));
+}
+
+.rv-text {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  font-weight: 400;
+  color: #3a3a52;
+}
+.rv-dots {
+  color: #c44949;
+  font-weight: 700;
+}
+
+.rv-more {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(196, 73, 73, 0.08);
+  color: #c44949;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.rv-more::after {
+  content: '→';
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+.rv-more:hover {
+  background: #c44949;
+  color: #fff;
+  transform: translateX(3px);
+}
+.rv-more:hover::after {
+  transform: translateX(3px);
+}
+
+.rv-foot {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 20px;
+  /* Pins the footer to the bottom so cards of different heights line up. */
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(196, 73, 73, 0.18);
+}
+.rv-foot-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #8a8a9e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.rv-foot-item:hover {
+  background: rgba(196, 73, 73, 0.08);
+  color: #c44949;
+  transform: translateY(-2px);
+}
+.rv-report::before {
+  content: '\2691';
+  font-size: 14px;
+}
+
+.rv-dot {
+  width: 24px;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: rgba(196, 73, 73, 0.2);
+  cursor: pointer;
+  transition: width 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+}
+.rv-dot:hover {
+  background: rgba(196, 73, 73, 0.5);
+}
+.rv-dot.is-on {
+  width: 36px;
+  background: linear-gradient(90deg, #c44949, #e87b7b);
+  box-shadow: 0 2px 8px rgba(196, 73, 73, 0.4);
+}
+
+@media (max-width: 1024px) {
+  .rv-viewport {
+    --rv-per: 2;
+  }
+}
+@media (max-width: 767px) {
+  .rv-viewport {
+    --rv-per: 1;
+  }
+  .rv-cell {
+    padding: 12px 6px !important;
+  }
+  .rv-card {
+    padding: 24px 20px 20px;
+    border-radius: 18px;
+  }
+  .rv-card::after {
+    font-size: 80px;
+    top: -5px;
+    right: 12px;
+  }
+  .rv-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+  .rv-name {
+    font-size: 14px;
+  }
+  .rv-text {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-card,
+  .rv-card:hover,
+  .rv-card:hover .rv-avatar,
+  .rv-more:hover,
+  .rv-foot-item:hover {
+    transform: none !important;
+  }
+}
+
+/* ================================================================== */
 /*  Responsive                                                         */
 /*  Inline styles win over the cascade, so overrides use !important.   */
 /* ================================================================== */
