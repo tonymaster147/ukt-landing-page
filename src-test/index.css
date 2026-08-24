@@ -604,6 +604,10 @@ button {
   }
   .page > section.pricing-sec:not(.strip-sec):not(.hero-sec) {
     padding-top: 22px !important;
+    padding-bottom: 18px !important;
+  }
+  .page > section.reviews-sec:not(.strip-sec):not(.hero-sec) {
+    padding-top: 16px !important;
   }
   .footer-logo {
     height: 52px !important;

@@ -1892,7 +1892,7 @@ function Pricing() {
   return (
     <section
       className="pricing-sec"
-      style={{ padding: '38px 0 84px', background: 'linear-gradient(180deg,#fff 0%,#FBF3F1 100%)' }}
+      style={{ padding: '38px 0 34px', background: 'linear-gradient(180deg,#fff 0%,#FBF3F1 100%)' }}
     >
       <div className="section-pad" style={{ maxWidth: 1020, margin: '0 auto', padding: '0 32px' }}>
         <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 52px' }}>
@@ -2084,8 +2084,9 @@ function ClientReviews() {
 
   return (
     <section
+      className="reviews-sec"
       style={{
-        padding: '76px 0 84px',
+        padding: '30px 0 78px',
         background: 'linear-gradient(180deg,#FBF3F1 0%,#FFFFFF 62%,#F7FBF9 100%)',
       }}
     >
