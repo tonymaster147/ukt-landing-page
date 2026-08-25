@@ -391,7 +391,7 @@ export const acceptance = {
     },
   ],
   barTitle: 'Translate My Document Now',
-  barNote: 'Delivered in 24 Hours  •  Starting at £25',
+  barNote: 'Delivered in 24 Hours  •  Starting at £15',
   cta: 'Get Started Right Now',
 }
 
