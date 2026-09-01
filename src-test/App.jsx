@@ -3145,6 +3145,139 @@ function SampleGlyph({ name }) {
   return name === 'stamp' ? <TrustIcon name="stamp" size={16} /> : <AcceptIcon name={name} size={16} />
 }
 
+/* ------------------------------------------------------------------ */
+/*  How it works — three red step cards, above the samples             */
+/* ------------------------------------------------------------------ */
+
+function HowIcon({ name, size = 42 }) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.5,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  if (name === 'upload')
+    return (
+      <svg {...p}>
+        <rect x="2.5" y="3.5" width="19" height="14.5" rx="2.2" />
+        <path d="M2.5 8h19" />
+        <path d="M6 5.7h.01M8.3 5.7h.01" />
+        <path d="M12 15.5v-4.6M9.9 12.8L12 10.7l2.1 2.1" />
+        <path d="M15.4 17.6l2.6 2.9 1.2-1.6 1.8.4-2.4-3" />
+      </svg>
+    )
+  if (name === 'quote')
+    return (
+      <svg {...p}>
+        <rect x="2.5" y="4" width="19" height="13" rx="2.2" />
+        <path d="M6.2 8h5M6.2 11h7M6.2 14h3.4" />
+        <path d="M16.6 11.4v4.4M14.6 13.4h4" />
+        <path d="M14.9 17.9l2.4 2.7 1.2-1.5 1.7.4-2.2-2.8" />
+      </svg>
+    )
+  /* deliver */
+  return (
+    <svg {...p}>
+      <path d="M14 3H6.5A2 2 0 0 0 4.5 5v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-8.5" />
+      <path d="M14 3v5h5.5" />
+      <path d="M7.6 12.4h5.2M7.6 15.4h3.6" />
+      <circle cx="17.6" cy="16.6" r="4.2" />
+      <path d="M15.8 16.6l1.3 1.3 2.4-2.6" />
+    </svg>
+  )
+}
+
+function HowItWorks() {
+  const H = data.howItWorks
+  return (
+    <section className="how-sec" style={{ padding: '84px 0', background: '#fff' }}>
+      <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
+        <h2 style={{ ...heading, textAlign: 'center', margin: '0 auto 40px', maxWidth: 820 }}>
+          {H.title}
+        </h2>
+
+        <div
+          className="grid-3"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}
+        >
+          {H.steps.map((s, i) => (
+            <div
+              key={s.title}
+              className="how-card"
+              style={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                padding: '34px 26px 30px',
+                borderRadius: 18,
+                background: 'linear-gradient(160deg,#E03A2D 0%,#B62317 100%)',
+                color: '#fff',
+                boxShadow: '0 18px 40px -18px rgba(182,35,23,0.55)',
+              }}
+            >
+              {/* Step number, quietly in the corner. */}
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 18,
+                  fontSize: 13,
+                  fontWeight: 900,
+                  letterSpacing: '0.5px',
+                  color: 'rgba(255,255,255,0.38)',
+                }}
+              >
+                {`0${i + 1}`}
+              </span>
+
+              <span style={{ color: '#fff', marginBottom: 14, lineHeight: 0 }}>
+                <HowIcon name={s.icon} />
+              </span>
+
+              <span
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 800,
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.72)',
+                  marginBottom: 7,
+                }}
+              >
+                {s.stage}
+              </span>
+
+              <h3 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 12px', color: '#fff' }}>
+                {s.title}
+              </h3>
+
+              <p
+                style={{
+                  fontSize: 15,
+                  lineHeight: 1.6,
+                  fontWeight: 500,
+                  margin: 0,
+                  color: 'rgba(255,255,255,0.93)',
+                }}
+              >
+                {s.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function TranslationSamples() {
   const s = data.translationSamples
   const narrow = useNarrow(640)
@@ -4435,6 +4568,7 @@ export default function App() {
       <Comparison />
       <Acceptance />
       <TrustReasons />
+      <HowItWorks />
       <TranslationSamples />
       <LanguageReach />
       {/* Removed from the page (components kept in this file so they can be

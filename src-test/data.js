@@ -712,3 +712,31 @@ export const clientReviews = {
     },
   ],
 }
+
+/* ------------------------------------------------------------------ */
+/*  How it works — three-step process, above the samples               */
+/* ------------------------------------------------------------------ */
+
+export const howItWorks = {
+  title: 'How to Get Translations: Our Process',
+  steps: [
+    {
+      icon: 'upload',
+      stage: 'Initiate Your Order',
+      title: 'Upload Documents',
+      desc: 'Once you select the type of translation (certified or professional), choose the source and target languages for your document. Lastly, specify whether you need expedited service. Confirm the total number of pages to get a free quotation.',
+    },
+    {
+      icon: 'quote',
+      stage: 'Complete Your Details & Checkout',
+      title: 'Receive Your Instant Quote',
+      desc: 'You will immediately see a comprehensive quote detailing the total cost and the projected delivery date. You can finalise your order by completing the payment using bank transfers, credit or debit card.',
+    },
+    {
+      icon: 'deliver',
+      stage: 'Receive Your Translation',
+      title: 'Translation Begins',
+      desc: 'Once payment is confirmed, we assign your document to a qualified, native-speaking translator. Your translation will be delivered as a digital PDF file directly to your email on or before the guaranteed delivery deadline.',
+    },
+  ],
+}
