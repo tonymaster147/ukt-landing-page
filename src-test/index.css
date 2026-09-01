@@ -609,6 +609,13 @@ button {
   .page > section.reviews-sec:not(.strip-sec):not(.hero-sec) {
     padding-top: 16px !important;
   }
+  /* How it works -> samples: two white sections that read as one block. */
+  .page > section.how-sec:not(.strip-sec):not(.hero-sec) {
+    padding-bottom: 18px !important;
+  }
+  .page > section.samples-sec:not(.strip-sec):not(.hero-sec) {
+    padding-top: 16px !important;
+  }
   .footer-logo {
     height: 52px !important;
   }

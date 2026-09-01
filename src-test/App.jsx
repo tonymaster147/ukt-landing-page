@@ -3195,7 +3195,7 @@ function HowIcon({ name, size = 42 }) {
 function HowItWorks() {
   const H = data.howItWorks
   return (
-    <section className="how-sec" style={{ padding: '84px 0', background: '#fff' }}>
+    <section className="how-sec" style={{ padding: '84px 0 34px', background: '#fff' }}>
       <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
         <h2 style={{ ...heading, textAlign: 'center', margin: '0 auto 40px', maxWidth: 820 }}>
           {H.title}
@@ -3289,7 +3289,7 @@ function TranslationSamples() {
   )
 
   return (
-    <section style={{ padding: '84px 0', background: '#fff' }}>
+    <section className="samples-sec" style={{ padding: '30px 0 84px', background: '#fff' }}>
       <div className="section-pad" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 32px' }}>
         <div style={{ textAlign: 'center', maxWidth: 780, margin: '0 auto 38px' }}>
           <h2 style={{ ...heading, marginBottom: 12 }}>{s.title}</h2>
