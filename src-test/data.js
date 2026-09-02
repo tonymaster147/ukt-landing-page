@@ -173,7 +173,7 @@ export const quickQuote = {
   sub: 'Get Your Free Quote Within 10 Minutes.',
   dropTitle: 'Click to browse or drop your document here',
   dropNote: 'PDF, JPG, PNG, DOCX accepted (Max 25MB)',
-  cta: 'Upload My Document',
+  cta: 'Upload & Start Your Order',
   ctaSend: 'Send My Document',
   badges: [
     { icon: 'award', text: 'Strict Confidentiality' },
@@ -233,7 +233,7 @@ export const languageReach = {
       langs: ['Swahili', 'Amharic', 'Yoruba', 'Somali', 'Hausa', 'Zulu', 'Tigrinya'],
     },
   ],
-  cta: 'Need Another Language? Get a Quote',
+  cta: 'Translate My Document',
 }
 
 export const translationSamples = {
@@ -340,7 +340,7 @@ export const trustReasons = {
   ],
   barTitle: 'Have an emergency? We are available. ',
   barNote: 'Secure Payment Options • No Hidden Fees',
-  cta: 'Get Your Fast Quote Now',
+  cta: 'Start Your Translation',
 }
 
 export const acceptance = {
@@ -405,7 +405,7 @@ export const comparison = {
     them: 'Typical Agencies',
     why: 'Why it matters to you',
   },
-  cta: 'Get Your Guaranteed Quote Now',
+  cta: 'Order Your Certified Translation',
   rows: [
     {
       feature: 'Home Office Approved',
@@ -497,7 +497,7 @@ export const pricingPlans = [
       { text: 'Digital Delivery (PDF / Word)' },
       { text: 'Turnaround: Varies', icon: 'bolt' },
     ],
-    cta: 'Get Business Quote',
+    cta: 'Order Professional Translation',
     featured: false,
   },
   {
@@ -520,7 +520,7 @@ export const pricingPlans = [
       { text: 'Digital PDF + Physical Hard Copy (Optional)' },
       { text: 'Express 24-Hour Delivery Available', icon: 'bolt' },
     ],
-    cta: 'Get Quote in 60s',
+    cta: 'Order Certified Translation',
     featured: true,
   },
 ]

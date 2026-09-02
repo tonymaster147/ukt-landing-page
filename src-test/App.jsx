@@ -1123,7 +1123,7 @@ function OfficialTrust() {
         </p>
 
         <div>
-          <CTA>Get Your Fixed-Price Quote</CTA>
+          <CTA>Start Your Translation</CTA>
         </div>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#8A857F', margin: '14px 0 0' }}>
           Home Office Compliant
@@ -2177,6 +2177,10 @@ function ClientReviews() {
             ))}
           </div>
         ) : null}
+
+        <div style={{ textAlign: 'center', marginTop: 34 }}>
+          <CTA>Start Your Translation</CTA>
+        </div>
       </div>
     </section>
   )
@@ -3422,7 +3426,7 @@ function TranslationSamples() {
                         fontWeight: 800,
                       }}
                     >
-                      <EyeIcon /> Preview Sample
+                      <EyeIcon /> View Translation Sample
                     </a>
                   ) : (
                     <span
@@ -3440,7 +3444,7 @@ function TranslationSamples() {
                         fontWeight: 800,
                       }}
                     >
-                      <EyeIcon /> Preview Sample
+                      <EyeIcon /> View Translation Sample
                     </span>
                   )}
                 </div>
@@ -4332,7 +4336,7 @@ function FAQ() {
           })}
         </div>
         <div style={{ textAlign: 'center' }}>
-          <CTA>Get a Free, No-Obligation Quote</CTA>
+          <CTA>Start Your Translation</CTA>
         </div>
       </div>
     </section>
