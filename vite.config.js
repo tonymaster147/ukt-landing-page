@@ -6,12 +6,17 @@ import { fileURLToPath } from 'node:url'
 // Dev-only: serve the INDEPENDENT test page (src-test/) at
 // /translation-agency-test-only/, so `npm run dev` lets you open either page.
 // The two pages have separate source, so editing one never affects the other.
+// `npm run dev:test` (DEV_PAGE=test) also serves the test page at /translation-agency/.
+const testAtMain = process.env.DEV_PAGE === 'test'
 const testPage = {
   name: 'dev-test-only-page',
   configureServer(server) {
     server.middlewares.use(async (req, res, next) => {
       const url = req.url || ''
-      const isTestHome = url === '/translation-agency-test-only/' || url === '/translation-agency-test-only'
+      const isTestHome =
+        url === '/translation-agency-test-only/' ||
+        url === '/translation-agency-test-only' ||
+        (testAtMain && (url === '/translation-agency/' || url === '/translation-agency'))
       if (isTestHome) {
         try {
           const file = fileURLToPath(new URL('./index-test.html', import.meta.url))
