@@ -801,8 +801,8 @@ function Hero() {
               margin: '0 0 18px',
             }}
           >
-            Certified UK Document Translations with{' '}
-            <span style={{ color: '#E8382B' }}>97.58% Acceptance Rate</span>
+            UK Translation Agency — Certified &amp; Professional Translation Services in{' '}
+            <span style={{ color: '#E8382B' }}>200+ Languages</span>
           </h1>
           <p
             style={{
@@ -828,7 +828,7 @@ function Hero() {
             }}
           >
             {[
-              'UK Government Accepted',
+              'Trusted by NHS & Gov.uk',
               'Same-Day & 24-Hour Delivery',
               'Human Certified Translators',
               'Starting from £15 (No Hidden Fees)',
@@ -2231,6 +2231,13 @@ function SpecialistBand() {
                   style={{ color: '#FF7A6E', fontWeight: 800, textDecoration: 'underline' }}
                 >
                   {b.linkText}
+                </a>{' '}
+                or{' '}
+                <a
+                  href={QUOTE_URL}
+                  style={{ color: '#FF7A6E', fontWeight: 800, textDecoration: 'underline' }}
+                >
+                  {b.uploadText}
                 </a>{' '}
                 {b.sub}
               </p>

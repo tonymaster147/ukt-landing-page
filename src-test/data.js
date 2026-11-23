@@ -402,7 +402,7 @@ export const comparison = {
   cols: {
     feature: 'Feature',
     us: 'Translations.co.uk',
-    them: 'Typical Agencies',
+    them: 'Other Providers',
     why: 'Why it matters to you',
   },
   cta: 'Order Your Certified Translation',
@@ -455,7 +455,8 @@ export const comparison = {
 export const specialistBand = {
   title: 'Need a custom volume discount or complex legal translation?',
   linkText: 'Talk to a Specialist',
-  sub: 'or upload your document for an immediate quote. No hidden fees.',
+  uploadText: 'upload your document',
+  sub: 'for an immediate quote. No hidden fees.',
   cta: 'Upload Document',
   badges: [
     { icon: 'cert', label: 'ISO 17100' },
