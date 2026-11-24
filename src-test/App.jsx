@@ -789,7 +789,7 @@ function Hero() {
             }}
           >
             <UKFlag w={18} />
-            <span>UK Translation Agency · Certified &amp; Professional</span>
+            <span>London Translation Agency · Serving the Whole UK</span>
           </div>
           <h1
             className="h1-hero"
